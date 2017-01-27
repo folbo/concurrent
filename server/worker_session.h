@@ -28,6 +28,7 @@ public:
     }
 
     void start() {
+        do_read_result_header();
     }
 
     bool is_working = false;
@@ -66,7 +67,6 @@ public:
             do_write();
         }
 
-        do_read_result_header();
         is_working = true;
     }
 
@@ -97,13 +97,11 @@ private:
                          asio::buffer(data_read_, 5),
                          [this](std::error_code ec, std::size_t length) {
                              if (!ec) {
-                                 std::cout << "do_read_header" << std::endl;
-                                 std::cout << "read: " << length <<  " bytes, [] = "
-                                 << (int)data_read_[0] << " "
-                                 << (int)data_read_[1] << " "
-                                 << (int)data_read_[2] << " "
-                                 << (int)data_read_[3] << " "
-                                 << (int)data_read_[4] << std::endl;
+                                 std::cout << "do_read__result_header" << std::endl;
+                                 std::cout << "read: " << length <<  " bytes, [] = ";
+                                 for (int i = 0; i < 25; i++)
+                                     std::cout << (int) data_read_[i] << " ";
+                                 std::cout << std::endl;
 
                                  int data_length = get_int(data_read_ + 1);
                                  std::cout << "received result. data_length = : " << data_length << ". reading body..." << std::endl;
@@ -122,6 +120,7 @@ private:
                          asio::buffer(data_read_ + 5, data_length),
                          [this](std::error_code ec, std::size_t length) {
                              if (!ec) {
+                                 std::cout << "do_read__result_body" << std::endl;
                                  std::cout << "received body :";
                                  for (int i = 0; i < 5 + length; i++)
                                      std::cout << (int) data_read_[i] << " ";

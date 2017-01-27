@@ -14,13 +14,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="449f607a-2ccb-41c1-8c3d-56a09f93dc00" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/client/processor.cpp" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CMakeLists.txt" afterPath="$PROJECT_DIR$/CMakeLists.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/client/CMakeLists.txt" afterPath="$PROJECT_DIR$/client/CMakeLists.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/client/processor.h" afterPath="$PROJECT_DIR$/client/processor.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/main.cpp" afterPath="$PROJECT_DIR$/server/main.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/matrix.h" afterPath="$PROJECT_DIR$/server/matrix.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/server.h" afterPath="$PROJECT_DIR$/server/server.h" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/worker_session.h" afterPath="$PROJECT_DIR$/server/worker_session.h" />
     </list>
     <ignored path="concurrent1.iws" />
@@ -45,8 +38,8 @@
       <file leaf-file-name="main.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="238">
-              <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+            <state relative-caret-position="476">
+              <caret line="28" column="46" selection-start-line="28" selection-start-column="46" selection-end-line="28" selection-end-column="46" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -67,8 +60,8 @@
       <file leaf-file-name="server.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server/server.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="482">
-              <caret line="48" column="9" selection-start-line="48" selection-start-column="9" selection-end-line="48" selection-end-column="9" />
+            <state relative-caret-position="6">
+              <caret line="20" column="39" selection-start-line="20" selection-start-column="39" selection-end-line="20" selection-end-column="39" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -79,8 +72,8 @@
       <file leaf-file-name="worker_session.h" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/server/worker_session.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="247">
-              <caret line="58" column="37" selection-start-line="58" selection-start-column="37" selection-end-line="58" selection-end-column="37" />
+            <state relative-caret-position="378">
+              <caret line="110" column="35" selection-start-line="110" selection-start-column="35" selection-end-line="110" selection-end-column="35" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -91,8 +84,8 @@
       <file leaf-file-name="processor.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/client/processor.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="446">
-              <caret line="105" column="88" selection-start-line="105" selection-start-column="88" selection-end-line="105" selection-end-column="88" />
+            <state relative-caret-position="599">
+              <caret line="114" column="29" selection-start-line="107" selection-start-column="0" selection-end-line="115" selection-end-column="5" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -113,8 +106,8 @@
         <option value="$PROJECT_DIR$/server/matrix.h" />
         <option value="$PROJECT_DIR$/server/main.cpp" />
         <option value="$PROJECT_DIR$/client/processor.h" />
-        <option value="$PROJECT_DIR$/server/worker_session.h" />
         <option value="$PROJECT_DIR$/server/server.h" />
+        <option value="$PROJECT_DIR$/server/worker_session.h" />
       </list>
     </option>
   </component>
@@ -647,12 +640,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/server/main.cpp">
+    <entry file="file://$PROJECT_DIR$/client/processor.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+        <state relative-caret-position="599">
+          <caret line="114" column="29" selection-start-line="107" selection-start-column="0" selection-end-line="115" selection-end-column="5" />
           <folding>
-            <element signature="e#0#19#0" expanded="true" />
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -665,30 +658,30 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/server/main.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="476">
+          <caret line="28" column="46" selection-start-line="28" selection-start-column="46" selection-end-line="28" selection-end-column="46" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/server/server.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="482">
-          <caret line="48" column="9" selection-start-line="48" selection-start-column="9" selection-end-line="48" selection-end-column="9" />
+        <state relative-caret-position="6">
+          <caret line="20" column="39" selection-start-line="20" selection-start-column="39" selection-end-line="20" selection-end-column="39" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/client/processor.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="446">
-          <caret line="105" column="88" selection-start-line="105" selection-start-column="88" selection-end-line="105" selection-end-column="88" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server/worker_session.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="58" column="37" selection-start-line="58" selection-start-column="37" selection-end-line="58" selection-end-column="37" />
+        <state relative-caret-position="378">
+          <caret line="110" column="35" selection-start-line="110" selection-start-column="35" selection-end-line="110" selection-end-column="35" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>
