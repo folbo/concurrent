@@ -4,13 +4,14 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+template <typename T>
 class matrix {
 public:
     matrix(int x, int y) : rows_{x}, cols_{y} {
         data.resize(x * y);
     }
 
-    matrix(const matrix &obj) {
+    matrix(const matrix<T> &obj) {
         data = obj.data;
         transposed = obj.transposed;
         rows_ = obj.rows_;
@@ -21,7 +22,7 @@ public:
     void transpose() {
         transposed = !transposed;
 
-        std::vector<char> result(rows_ * cols_);
+        std::vector<T> result(rows_ * cols_);
         for (int a = 0; a < rows_ * cols_; a++) {
             int i = a % rows_;
             int j = a / rows_;
@@ -33,32 +34,32 @@ public:
     }
 
     inline
-    char &operator()(unsigned row, unsigned col) {
+    T &operator()(unsigned row, unsigned col) {
         if (row >= rows_ || col >= cols_)
             throw std::out_of_range("matrix out of bounds");
         return data[cols_ * row + col];
     }
 
     inline
-    char operator()(unsigned row, unsigned col) const {
+    T operator()(unsigned row, unsigned col) const {
         if (row >= rows_ || col >= cols_)
             throw std::out_of_range("const matrix subscript out of bounds");
         return data[cols_ * row + col];
     }
 
     inline
-    std::vector<char> &get_data() { return data; }
+    std::vector<T> &get_data() { return data; }
 
     inline
-    std::vector<char> get_row(int row) {
-        std::vector<char> result(cols_);
-        std::memcpy(result.data(), &(data[row * cols_]), cols_);
+    std::vector<T> get_row(int row) {
+        std::vector<T> result(cols_);
+        std::memcpy(result.data(), &(data[row * cols_]), cols_ * sizeof(T));
         return result;
     }
 
     inline
-    std::vector<char> get_col(int col) {
-        std::vector<char> result(rows_);
+    std::vector<T> get_col(int col) {
+        std::vector<T> result(rows_);
         for (int i = 0; i < rows_; i++)
             result[i] = data[cols_ * i + col];
 
@@ -93,7 +94,7 @@ public:
 
 private:
     bool transposed = false;
-    std::vector<char> data;
+    std::vector<T> data;
 
     int rows_, cols_;
 };

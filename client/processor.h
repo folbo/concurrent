@@ -37,7 +37,7 @@ private:
                          [this, self](std::error_code ec, std::size_t length) {
                              if (!ec) {
                                  int data_length = get_int(data_ + 1);
-                                 std::cout << "read len: " << data_length << std::endl;
+                                 //std::cout << "read len: " << data_length << std::endl;
 
                                  do_read_body(data_length);
                              }
@@ -54,31 +54,33 @@ private:
                          asio::buffer(data_ + 5, data_length),
                          [this, self](std::error_code ec, std::size_t length) {
                              if (!ec) {
-                                 std::cout << "read frame: ";
-                                 for (int i = 0; i < 5 + length; i++)
-                                     std::cout << (int) data_[i] << " ";
-                                 std::cout << std::endl;
+                                 //std::cout << "read frame ";
+                                 //for (int i = 0; i < 5 + length; i++)
+                                 //    std::cout << (int) data_[i] << " ";
+                                 //std::cout << std::endl;
 
                                  if (data_[0] == 3) // dot product
                                  {
+                                     // number of elements in row/col
                                      int size = get_int(&(data_[13]));
-                                     std::cout << size << std::endl;
+                                     //std::cout << size << std::endl;
+
 
                                      std::vector<char> indexes(8);
                                      std::memcpy(indexes.data(), &(data_[5]), 8);
 
-                                     std::vector<char> a(size);
-                                     std::vector<char> b(size);
+                                     std::vector<int> a(size);
+                                     std::vector<int> b(size);
 
-                                     std::memcpy(a.data(), &(data_[17]), size);
-                                     std::memcpy(b.data(), &(data_[17 + size]), size);
+                                     std::memcpy(a.data(), &(data_[17]), size * sizeof(int));
+                                     std::memcpy(b.data(), &(data_[17 + (size * sizeof(int))]), size * sizeof(int));
 
                                      int sum = 0;
                                      for (int k = 0; k < size; k++) {
                                          sum += a[k] * b[k];
                                      }
 
-                                     std::cout << sum << std::endl;
+                                     //std::cout << sum << std::endl;
 
                                      do_send_result(sum, indexes);
                                  }
@@ -96,19 +98,18 @@ private:
 
         data_model frame(CommandType::DotProduct, indexes);
 
-
         std::vector<char> buff = frame.serialize_frame();
-        std::cout << "created data of size: " << buff.size() << std::endl;
+        //std::cout << "created data of size: " << buff.size() << std::endl;
 
         auto self(shared_from_this());
         asio::async_write(socket_,
                           asio::buffer(buff.data(), buff.size()),
                           [this, self, buff](std::error_code ec, std::size_t /*length*/) {
                               if (!ec) {
-                                  std::cout << "sent result: ";
-                                  for (int i = 0; i < buff.size(); i++)
-                                      std::cout << (int) buff[i] << " ";
-                                  std::cout << std::endl << "waiting for next frame...";
+                                  //std::cout << "sent result: ";
+                                  //for (int i = 0; i < buff.size(); i++)
+                                  //    std::cout << (int) buff[i] << " ";
+                                  //std::cout << std::endl << "waiting for next frame...";
 
                                   do_read_header();
                               }

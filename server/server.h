@@ -14,10 +14,10 @@
 class server {
 
     using tcp = asio::ip::tcp;
-    matrix& output_matrix;
+    matrix<int>& output_matrix;
 public:
 
-    server(asio::io_service &io_service, short port, matrix& m) :
+    server(asio::io_service &io_service, short port, matrix<int>& m) :
             acceptor_(io_service, tcp::endpoint(tcp::v4(), port)),
             socket_(io_service),
             output_matrix{m} {
@@ -30,7 +30,7 @@ public:
         return workers.size();
     }
 
-    void begin_mul(matrix& m1, matrix& m2) {
+    void begin_mul(matrix<int>& m1, matrix<int>& m2) {
         int n = workers.size();
         int ad = 0;
 
@@ -42,9 +42,9 @@ public:
                 workers[ad]->command_mul(row, col, i, j, m1.cols());
                 ad++;
                 ad %= n;
-                std::cout << "node number: " << ad << std::endl;
+                //std::cout << "node number: " << ad << std::endl;
 
-                std::this_thread::sleep_for(std::chrono::seconds(10));
+                //std::this_thread::sleep_for(std::chrono::seconds(10));
             }
         }
     }
@@ -55,7 +55,6 @@ private:
         acceptor_.async_accept(socket_,
                                [this](std::error_code ec) {
                                    if (!ec) {
-
                                        auto w = std::make_shared<worker_session>(std::move(socket_), output_matrix);
                                        workers.emplace_back(w);
                                        w->start();
