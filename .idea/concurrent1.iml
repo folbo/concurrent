@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="CPP_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/client/main.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/client/processor.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/client/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/client/client.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/client/data_model.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/server/matrix.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/server/main.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/server/worker_session.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/server/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/server/server.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/ThreadPool/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/ThreadPool/ThreadPool.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/ThreadPool/ThreadPool.cpp" isTestSource="false" />
+    </content>
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library name="Header Search Paths">
+        <CLASSES>
+          <root url="file://C:/boost_1_57_0" />
+          <root url="file://$MODULE_DIR$/../asio-1.10.6/include" />
+          <root url="file://D:/MinGW-w64/mingw32/lib/gcc/i686-w64-mingw32/4.9.2/include-fixed" />
+          <root url="file://D:/MinGW-w64/mingw32/lib/gcc/i686-w64-mingw32/4.9.2/include" />
+          <root url="file://D:/MinGW-w64/mingw32/i686-w64-mingw32/include" />
+        </CLASSES>
+        <SOURCES>
+          <root url="file://C:/boost_1_57_0" />
+          <root url="file://$MODULE_DIR$/../asio-1.10.6/include" />
+          <root url="file://D:/MinGW-w64/mingw32/lib/gcc/i686-w64-mingw32/4.9.2/include-fixed" />
+          <root url="file://D:/MinGW-w64/mingw32/lib/gcc/i686-w64-mingw32/4.9.2/include" />
+          <root url="file://D:/MinGW-w64/mingw32/i686-w64-mingw32/include" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+  </component>
+</module>

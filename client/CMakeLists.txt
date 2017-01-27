@@ -28,7 +28,7 @@ include_directories(${Asio_INCLUDE_DIR})
 
 link_directories(../ThreadPool)
 
-add_executable (${exe_name} main.cpp data_model.h client.h processor.cpp processor.h)
+add_executable (${exe_name} main.cpp data_model.h client.h processor.h)
 
 target_link_libraries (${exe_name} ws2_32 wsock32)
 target_link_libraries(${exe_name} ThreadPool)
