@@ -89,8 +89,7 @@ private:
                                  {
                                      // number of elements in row/col
                                      int size = get_int(&(data_[21]));
-                                     //std::cout << size << std::endl;
-
+                                     std::cout << size << std::endl;
 
                                      std::vector<char> indexes(20);
                                      std::memcpy(indexes.data(), &(data_[5]), 20);
@@ -104,11 +103,10 @@ private:
                                      char* a_start = &(data_[25]);
                                      char* b_start = &(data_[25 + la * size * sizeof(int)]);
 
-                                     int index_a = 0;
-
                                      std::vector<int> c;
-                                     c.reserve(la*lb);
+                                     c.resize(la*lb);
 
+                                     std::cout << "c has " << la << " * " << lb << "=" << la*lb << " elements" << std::endl;
                                      for(int i = 0; i < la; i++){ //row
                                          for(int j = 0; j < lb; j++){ //col
                                              int* ptr_a = reinterpret_cast<int*>(a_start + i * size * sizeof(int));
@@ -118,6 +116,7 @@ private:
                                              for(int k = 0; k < size; k++){ //col
                                                 sum += ptr_a[k] * ptr_b[k];
                                              }
+                                             std::cout << "c[" << i * lb + j << "]" << std::endl;
                                              c[i * lb + j] = sum;
                                          }
                                      }
@@ -157,9 +156,9 @@ private:
     }
 
     void do_send_result_chunk(std::vector<int> matrix, std::vector<char> indexes) {
-        std::vector<char> result; result.reserve(matrix.size()*sizeof(int) + indexes.size());
+        std::vector<char> result(matrix.size()*sizeof(int) + indexes.size());
 
-        result.insert(result.end(), indexes.begin(), indexes.end());
+        std::memcpy(&(result[0]), &(indexes[0]), indexes.size());
         std::memcpy(&(result[indexes.size()]), matrix.data(), matrix.size()*sizeof(int));
 
         data_model frame(CommandType::DotProductChunk, result);

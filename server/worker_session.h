@@ -93,37 +93,46 @@ public:
     {
         //serialize to bytes
         int data_size = a.rows()*a.cols()*sizeof(int) + b.rows()*b.cols()*sizeof(int) + 4 * sizeof(int);
-
+        std::cout << "data size: " << data_size << std::endl;
         std::vector<char> d;
-        d.reserve(5 + data_size);
+        d.resize(5 + data_size);
 
         //append header frame info
-        d.push_back((unsigned char) CommandType::DotProductChunked);
+        d[0] = ((unsigned char) CommandType::DotProductChunked);
 
         auto len = get_bytes_int(data_size);
-        d.insert(d.end(), len.begin(), len.end());
+        std::memcpy(&(d[1]), len.data(), sizeof(int));
 
         // body 1 + 4 + 5*4 = 25
         auto x_v = get_bytes_int(x); //int result row
-        d.insert(d.end(), x_v.begin(), x_v.end());
+        std::memcpy(&(d[5]), x_v.data(), sizeof(int));
 
         auto y_v = get_bytes_int(y); //int result col
-        d.insert(d.end(), y_v.begin(), y_v.end());
+        std::memcpy(&(d[9]), y_v.data(), sizeof(int));
 
         auto la_v = get_bytes_int(la); //int height of 1st matrix
-        d.insert(d.end(), la_v.begin(), la_v.end());
+        std::memcpy(&(d[13]), la_v.data(), sizeof(int));
 
         auto lb_v = get_bytes_int(lb); //int width of 2nd matrix
-        d.insert(d.end(), lb_v.begin(), lb_v.end());
+        std::memcpy(&(d[17]), lb_v.data(), sizeof(int));
 
         auto n_v = get_bytes_int(n); //int common length
-        d.insert(d.end(), n_v.begin(), n_v.end());
+        std::memcpy(&(d[21]), n_v.data(), sizeof(int));
         // append 2 vectors to buffer
 
 
-        char* eeeee = reinterpret_cast<char*>(a.get_data().data());
         int bytes_of_a = a.get_data().size()*sizeof(int);
-        std::memcpy(&(d[25]), eeeee, bytes_of_a);
+        std::memcpy(&(d[25]), a.get_data().data(), bytes_of_a);
+
+        matrix<int> transposed(b);
+        //transposed.transpose();
+
+        b.print();
+        std::cout<<std::endl;
+        transposed.print();
+
+        int bytes_of_b = transposed.get_data().size()*sizeof(int);
+        std::memcpy(&(d[25 + bytes_of_a]), a.get_data().data(), bytes_of_b);
 
         //transpose
         //for(int i = 0; i < lb; i++) {
@@ -208,7 +217,11 @@ private:
 
                                  char d[length];
                                  std::memcpy(d, &(data_read_[5]), length);
-                                 handle_result(d);
+
+                                 if(data_read_[0] == (char)CommandType::DotProduct)
+                                    handle_result_dotproduct(d);
+                                 if(data_read_[0] == (char)CommandType::DotProductChunked)
+                                    handle_result_chunk(d);
 
                                  do_read_result_header();
                              }
@@ -219,12 +232,31 @@ private:
                          });
     }
 
-    void handle_result(char* data) {
+    void handle_result_dotproduct(char* data) {
         int row = get_int(&(data[0]));
         int col = get_int(&(data[4]));
 
         //std::cout << "handle result, row=" <<  row << ", col=" << col;
         output_matrix(row, col) = get_int(&(data[8]));
+    }
+
+    void handle_result_chunk(char* data) {
+        int row = get_int(&(data[0]));
+        int col = get_int(&(data[4]));
+        int la = get_int(&(data[8]));
+        int lb = get_int(&(data[12]));
+        int n = get_int(&(data[16]));
+
+        matrix<int> part(la,lb);
+
+        std::cout << "received matrix " << la << "x" << lb << std::endl;
+
+        std::memcpy(part.get_data().data(), &(data[20]), la*lb*sizeof(int));
+        part.print();
+
+
+        //std::cout << "handle result, row=" <<  row << ", col=" << col;
+        //output_matrix(row, col) = get_int(&(data[8]));
     }
 
     int get_int(const char *buffer) {

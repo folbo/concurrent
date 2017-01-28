@@ -60,9 +60,9 @@ public:
 
             for(int j = 0; j < m1.rows() / chunk_size_a; j++){
                 int row = j * chunk_size_a;
-                std::cout << row << " " << col << std::endl;
+                std::cout << "server: command_mul_chunked(chunk1, chunk2, " << row << ", " << col << ", " << chunk_size_a << ", " << chunk_size_b << ", " << m1.cols() << ");"<< std::endl;
                 auto chunk1 = m1.get_rows(row, chunk_size_a);
-                workers[ad]->command_mul_chunked(chunk1, chunk2, j, i, chunk_size_a, chunk_size_b, m1.cols());
+                workers[ad]->command_mul_chunked(chunk1, chunk2, row, col, chunk_size_a, chunk_size_b, m1.cols());
                 ad++;
                 ad %= n;
             }

@@ -11,12 +11,12 @@ public:
         data.resize(x * y);
     }
 
-    matrix(const matrix<T> &obj) {
-        data = obj.data;
-        transposed = obj.transposed;
-        rows_ = obj.rows_;
-        cols_ = obj.cols_;
-    }
+    //matrix(const matrix<T> &obj) {
+        //data = obj.data;
+        //transposed = obj.transposed;
+        //rows_ = obj.rows_;
+        //cols_ = obj.cols_;
+    //}
 
     // transposes the matrix
     void transpose() {
