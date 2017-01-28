@@ -72,7 +72,7 @@ public:
         }
 
         //print
-        //std::cout << "sending: ";
+        std::cout << "sending: " << std::endl;
         //for (int i = 0; i < d.size(); i++)
         //    std::cout << (int) d[i] << " ";
         //std::cout << std::endl;
@@ -89,11 +89,11 @@ public:
     }
 
 
-    void command_mul_chunked(matrix<int> &a, matrix<int> &b, int x, int y, int la, int lb, int n)
+    void command_mul_chunked(matrix<int> a, matrix<int> b, int x, int y, int la, int lb, int n)
     {
         //serialize to bytes
         int data_size = a.rows()*a.cols()*sizeof(int) + b.rows()*b.cols()*sizeof(int) + 5 * sizeof(int);
-        std::cout << "data size: " << data_size << std::endl;
+        //std::cout << "data size: " << data_size << std::endl;
         std::vector<char> d(5 + data_size);
 
         //append header frame info
@@ -126,29 +126,22 @@ public:
         matrix<int> transposed(b);
         //transposed.transpose();
 
-        b.print();
-        std::cout<<std::endl;
+        a.print();
+        std::cout << std::endl;
         transposed.print();
+        std::cout << std::endl;
+        transposed.transpose();
 
         int bytes_of_b = transposed.get_data().size()*sizeof(int);
-        std::memcpy(&(d[25 + bytes_of_a]), a.get_data().data(), bytes_of_b);
-
-        //transpose
-        //for(int i = 0; i < lb; i++) {
-        //    auto cache = b.get_col(i);
-        //    char* fffff = reinterpret_cast<char*>(cache.data());
-        //    int bytes_of_col_of_b = cache.size()*sizeof(int);
-        //    std::memcpy(&(d[25]), eeeee, bytes_of_col_of_b);
-        //}
+        std::memcpy(&(d[25 + bytes_of_a]), transposed.get_data().data(), bytes_of_b);
 
         //print
-        std::cout << "sending: ";
-        for (int i = 0; i < d.size(); i++)
-            std::cout << (int) d[i] << " ";
-        std::cout << std::endl;
+        std::cout << "sending" << std::endl;
+        //for (int i = 0; i < d.size(); i++)
+        //    std::cout << (int) d[i] << " ";
+        //std::cout << std::endl;
 
         //write
-
         bool write_in_progress = !output_deq.empty();
         output_deq.push_back(d);
         if (!write_in_progress) {
@@ -166,8 +159,6 @@ private:
                               if (!ec) {
                                   //std::cout << "do_write" << std::endl;
                                   output_deq.pop_front();
-
-                                  //immediately wait for response
 
                                   if(!output_deq.empty())
                                       do_write();
@@ -189,7 +180,9 @@ private:
                                  //for (int i = 0; i < 5; i++)
                                  //    std::cout << (int) data_read_[i] << " ";
                                  //std::cout << std::endl;
+
                                  int data_length = get_int(data_read_ + 1);
+
                                  //std::cout << "received result. data_length = : " << data_length << ". reading body..." << std::endl;
 
                                  do_read_result_body(data_length);
@@ -214,7 +207,6 @@ private:
 
                                  char d[length];
                                  std::memcpy(d, &(data_read_[5]), length);
-
 
                                  if(data_read_[0] == (char)CommandType::DotProduct)
                                     handle_result_dotproduct(d);
@@ -246,18 +238,12 @@ private:
         int n = get_int(&(data[16]));
 
         matrix<int> part(la,lb);
-
-        std::cout << "received matrix " << la << "x" << lb << std::endl;
-
         std::memcpy(part.get_data().data(), &(data[20]), la*lb*sizeof(int));
-        part.print();
+        //part.print();
 
         std::cout << "patching: row=" << row << ", col=" << col << std::endl;
 
         output_matrix.patch(part, row, col);
-        //output_matrix(row, col) = get_int(&(data[8]));
-
-
     }
 
     int get_int(const char *buffer) {

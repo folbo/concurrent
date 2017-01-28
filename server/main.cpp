@@ -39,10 +39,13 @@ int main(int argc, char **argv) {
         // 3 4 5  x 1 4 7   =  14   50  86
         // 6 7 8    2 5 8      23   86  149
 
-        //int n = 3;
-        //matrix<int> m1(n, n);
-        //for (int i = 0; i < n*n; i++)
-        //    m1(i / n, i % n) = i;
+        //int nn = 3;
+        //matrix<int> m3(nn, nn);
+        //for (int i = 0; i < nn*nn; i++)
+        //    m3(i / nn, i % nn) = i;
+        //m3.print();
+
+        //m1.patch(m3, 2,2);
         //m1.print();
 
         //std::cout << "\n\n\n";
@@ -88,7 +91,6 @@ int main(int argc, char **argv) {
 
         s.close();
         t.join();
-
     } catch (std::exception &e) {
         std::cout << "Exception: " << e.what() << "\n";
     }

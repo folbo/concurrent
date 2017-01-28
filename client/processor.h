@@ -91,6 +91,13 @@ private:
                                      int size = get_int(&(data_[21]));
                                      std::cout << size << std::endl;
 
+                                     std::cout << "frame: ";
+                                     for(int i=5; i < 5 + length; ++i) {
+                                         std::cout << std::hex << (int) data_[i];
+                                     }
+
+                                     std::cout << std::dec << std::endl;
+
                                      std::vector<char> indexes(20);
                                      std::memcpy(indexes.data(), &(data_[5]), 20);
 
@@ -103,10 +110,20 @@ private:
                                      char* a_start = &(data_[25]);
                                      char* b_start = &(data_[25 + la * size * sizeof(int)]);
 
-                                     std::vector<int> c;
-                                     c.resize(la*lb);
+                                     std::vector<int> c(la*lb);
 
-                                     std::cout << "c has " << la << " * " << lb << "=" << la*lb << " elements" << std::endl;
+                                     //print A
+                                     for (int a = 0; a < la * size; a++) {
+                                         std::cout << *( reinterpret_cast<int*>(a_start + a*sizeof(int)) )<< " ";
+                                         if ((a + 1) % size == 0) std::cout << std::endl;
+                                     }
+
+                                     //print A
+                                     for (int b = 0; b < lb * size; b++) {
+                                         std::cout << *( reinterpret_cast<int*>(b_start + b*sizeof(int)) )<< " ";
+                                         if ((b + 1) % size == 0) std::cout << std::endl;
+                                     }
+
                                      for(int i = 0; i < la; i++){ //row
                                          for(int j = 0; j < lb; j++){ //col
                                              int* ptr_a = reinterpret_cast<int*>(a_start + i * size * sizeof(int));

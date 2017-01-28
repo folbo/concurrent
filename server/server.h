@@ -53,21 +53,53 @@ public:
         int n = workers.size();
         int ad = 0;
 
-        for(int i = 0; i < m2.cols() / chunk_size_b; i++){
-
+        int i = 0;
+        for(; i < m2.cols() / chunk_size_b; i++){
             int col = i * chunk_size_b; //col + chunk_size_b - ostatnia kolumna chunka
-            auto chunk2 = m1.get_rows(col, chunk_size_b);
+            auto chunk2 = m2.get_cols(col, chunk_size_b);
 
-            for(int j = 0; j < m1.rows() / chunk_size_a; j++){
+            int j = 0;
+            for(; j < m1.rows() / chunk_size_a; j++){
                 int row = j * chunk_size_a;
-                std::cout << "server: command_mul_chunked(chunk1, chunk2, " << row << ", " << col << ", " << chunk_size_a << ", " << chunk_size_b << ", " << m1.cols() << ");"<< std::endl;
                 auto chunk1 = m1.get_rows(row, chunk_size_a);
+
                 workers[ad]->command_mul_chunked(chunk1, chunk2, row, col, chunk_size_a, chunk_size_b, m1.cols());
-                //std::this_thread::sleep_for(std::chrono::seconds(10));
+
                 ad++;
                 ad %= n;
+                //std::this_thread::sleep_for(std::chrono::seconds(10));
             }
+
+            int last_chunk_size_a = m1.rows() % chunk_size_a;
+            int row = j * chunk_size_a;
+            auto chunk1 = m1.get_rows(row, last_chunk_size_a);
+
+            workers[ad]->command_mul_chunked(chunk1, chunk2, row, col, last_chunk_size_a, chunk_size_b, m1.cols());
         }
+
+        //last column chunk
+        int last_chunk_size_b = m2.cols() % chunk_size_b;
+        int col = i * chunk_size_b; //col + chunk_size_b - ostatnia kolumna chunka
+        auto chunk2 = m2.get_cols(col, last_chunk_size_b);
+
+        int j = 0;
+        for( ; j < m1.rows() / chunk_size_a; j++){
+            int last_chunk_size_a = m1.rows() % chunk_size_a;
+            int row = j * chunk_size_a;
+            auto chunk1 = m1.get_rows(row, chunk_size_a);
+
+            workers[ad]->command_mul_chunked(chunk1, chunk2, row, col, chunk_size_a, last_chunk_size_b, m1.cols());
+
+            ad++;
+            ad %= n;
+            //std::this_thread::sleep_for(std::chrono::seconds(10));
+        }
+        int last_chunk_size_a = m1.rows() % chunk_size_a;
+        int row = j * chunk_size_a;
+        auto chunk1 = m1.get_rows(row, last_chunk_size_a);
+
+        workers[ad]->command_mul_chunked(chunk1, chunk2, row, col, last_chunk_size_a, last_chunk_size_b, m1.cols());
+
     }
 
 
