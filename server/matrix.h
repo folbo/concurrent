@@ -83,6 +83,13 @@ public:
     }
 
     inline
+    void patch(matrix<T> &part, int row, int col) {
+        for(int i = 0; i < part.rows(); i++){
+            std::memcpy(&(data[(i+row)*cols_ + col]), &(part.get_row(i)[0]), part.cols() * sizeof(T));
+        }
+    }
+
+    inline
     int index_to_row(int a) { return a / rows_; }
 
     inline

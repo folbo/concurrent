@@ -63,6 +63,7 @@ public:
                 std::cout << "server: command_mul_chunked(chunk1, chunk2, " << row << ", " << col << ", " << chunk_size_a << ", " << chunk_size_b << ", " << m1.cols() << ");"<< std::endl;
                 auto chunk1 = m1.get_rows(row, chunk_size_a);
                 workers[ad]->command_mul_chunked(chunk1, chunk2, row, col, chunk_size_a, chunk_size_b, m1.cols());
+                //std::this_thread::sleep_for(std::chrono::seconds(10));
                 ad++;
                 ad %= n;
             }

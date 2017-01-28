@@ -189,7 +189,6 @@ private:
                                  //for (int i = 0; i < 5; i++)
                                  //    std::cout << (int) data_read_[i] << " ";
                                  //std::cout << std::endl;
-
                                  int data_length = get_int(data_read_ + 1);
                                  //std::cout << "received result. data_length = : " << data_length << ". reading body..." << std::endl;
 
@@ -215,6 +214,7 @@ private:
 
                                  char d[length];
                                  std::memcpy(d, &(data_read_[5]), length);
+
 
                                  if(data_read_[0] == (char)CommandType::DotProduct)
                                     handle_result_dotproduct(d);
@@ -252,9 +252,12 @@ private:
         std::memcpy(part.get_data().data(), &(data[20]), la*lb*sizeof(int));
         part.print();
 
+        std::cout << "patching: row=" << row << ", col=" << col << std::endl;
 
-        //std::cout << "handle result, row=" <<  row << ", col=" << col;
+        output_matrix.patch(part, row, col);
         //output_matrix(row, col) = get_int(&(data[8]));
+
+
     }
 
     int get_int(const char *buffer) {
