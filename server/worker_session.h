@@ -92,10 +92,9 @@ public:
     void command_mul_chunked(matrix<int> &a, matrix<int> &b, int x, int y, int la, int lb, int n)
     {
         //serialize to bytes
-        int data_size = a.rows()*a.cols()*sizeof(int) + b.rows()*b.cols()*sizeof(int) + 4 * sizeof(int);
+        int data_size = a.rows()*a.cols()*sizeof(int) + b.rows()*b.cols()*sizeof(int) + 5 * sizeof(int);
         std::cout << "data size: " << data_size << std::endl;
-        std::vector<char> d;
-        d.resize(5 + data_size);
+        std::vector<char> d(5 + data_size);
 
         //append header frame info
         d[0] = ((unsigned char) CommandType::DotProductChunked);
@@ -181,7 +180,6 @@ private:
     }
 
     void do_read_result_header() {
-        data_read_[0] = 111;
         asio::async_read(socket_,
                          asio::buffer(data_read_, 5),
                          [this](std::error_code ec, std::size_t length) {
