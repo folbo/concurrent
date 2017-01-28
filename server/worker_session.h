@@ -11,7 +11,8 @@
 enum class CommandType {
     Hello = 1,
     Please = 2,
-    DotProduct = 3
+    DotProduct = 3,
+    DotProductChunked = 4
 };
 
 class worker_session : public std::enable_shared_from_this<worker_session> {
@@ -75,6 +76,68 @@ public:
         //for (int i = 0; i < d.size(); i++)
         //    std::cout << (int) d[i] << " ";
         //std::cout << std::endl;
+
+        //write
+
+        bool write_in_progress = !output_deq.empty();
+        output_deq.push_back(d);
+        if (!write_in_progress) {
+            do_write();
+        }
+
+        is_working = true;
+    }
+
+
+    void command_mul_chunked(matrix<int> &a, matrix<int> &b, int x, int y, int la, int lb, int n)
+    {
+        //serialize to bytes
+        int data_size = a.rows()*a.cols()*sizeof(int) + b.rows()*b.cols()*sizeof(int) + 4 * sizeof(int);
+
+        std::vector<char> d;
+        d.reserve(5 + data_size);
+
+        //append header frame info
+        d.push_back((unsigned char) CommandType::DotProductChunked);
+
+        auto len = get_bytes_int(data_size);
+        d.insert(d.end(), len.begin(), len.end());
+
+        // body 1 + 4 + 5*4 = 25
+        auto x_v = get_bytes_int(x); //int result row
+        d.insert(d.end(), x_v.begin(), x_v.end());
+
+        auto y_v = get_bytes_int(y); //int result col
+        d.insert(d.end(), y_v.begin(), y_v.end());
+
+        auto la_v = get_bytes_int(la); //int height of 1st matrix
+        d.insert(d.end(), la_v.begin(), la_v.end());
+
+        auto lb_v = get_bytes_int(lb); //int width of 2nd matrix
+        d.insert(d.end(), lb_v.begin(), lb_v.end());
+
+        auto n_v = get_bytes_int(n); //int common length
+        d.insert(d.end(), n_v.begin(), n_v.end());
+        // append 2 vectors to buffer
+
+
+        char* eeeee = reinterpret_cast<char*>(a.get_data().data());
+        int bytes_of_a = a.get_data().size()*sizeof(int);
+        std::memcpy(&(d[25]), eeeee, bytes_of_a);
+
+        //transpose
+        //for(int i = 0; i < lb; i++) {
+        //    auto cache = b.get_col(i);
+        //    char* fffff = reinterpret_cast<char*>(cache.data());
+        //    int bytes_of_col_of_b = cache.size()*sizeof(int);
+        //    std::memcpy(&(d[25]), eeeee, bytes_of_col_of_b);
+        //}
+
+        //print
+        std::cout << "sending: ";
+        for (int i = 0; i < d.size(); i++)
+            std::cout << (int) d[i] << " ";
+        std::cout << std::endl;
 
         //write
 

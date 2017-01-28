@@ -5,9 +5,10 @@
 #define	DATA_MODEL_H
 
 enum class CommandType {
-  Hello = 1,
-  Please = 2,
-  DotProduct = 3
+    Hello = 1,
+    Please = 2,
+    DotProduct = 3,
+    DotProductChunk = 4
 };
 
 

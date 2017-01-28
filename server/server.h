@@ -49,6 +49,27 @@ public:
         }
     }
 
+    void begin_mul_chunked(matrix<int>& m1, matrix<int>& m2, int chunk_size_a, int chunk_size_b) {
+        int n = workers.size();
+        int ad = 0;
+
+        for(int i = 0; i < m2.cols() / chunk_size_b; i++){
+
+            int col = i * chunk_size_b; //col + chunk_size_b - ostatnia kolumna chunka
+            auto chunk2 = m1.get_rows(col, chunk_size_b);
+
+            for(int j = 0; j < m1.rows() / chunk_size_a; j++){
+                int row = j * chunk_size_a;
+                std::cout << row << " " << col << std::endl;
+                auto chunk1 = m1.get_rows(row, chunk_size_a);
+                workers[ad]->command_mul_chunked(chunk1, chunk2, j, i, chunk_size_a, chunk_size_b, m1.cols());
+                ad++;
+                ad %= n;
+            }
+        }
+    }
+
+
 private:
 
     void do_accept() {

@@ -84,6 +84,46 @@ private:
 
                                      do_send_result(sum, indexes);
                                  }
+
+                                 if (data_[0] == 4) // dot product
+                                 {
+                                     // number of elements in row/col
+                                     int size = get_int(&(data_[21]));
+                                     //std::cout << size << std::endl;
+
+
+                                     std::vector<char> indexes(20);
+                                     std::memcpy(indexes.data(), &(data_[5]), 20);
+
+                                     int la = get_int(&(data_[13]));
+                                     int lb = get_int(&(data_[17]));
+
+                                     std::vector<int> a(size*la);
+                                     std::vector<int> b(size*lb);
+
+                                     char* a_start = &(data_[25]);
+                                     char* b_start = &(data_[25 + la * size * sizeof(int)]);
+
+                                     int index_a = 0;
+
+                                     std::vector<int> c;
+                                     c.reserve(la*lb);
+
+                                     for(int i = 0; i < la; i++){ //row
+                                         for(int j = 0; j < lb; j++){ //col
+                                             int* ptr_a = reinterpret_cast<int*>(a_start + i * size * sizeof(int));
+                                             int* ptr_b = reinterpret_cast<int*>(b_start + j * size * sizeof(int));
+
+                                             int sum = 0;
+                                             for(int k = 0; k < size; k++){ //col
+                                                sum += ptr_a[k] * ptr_b[k];
+                                             }
+                                             c[i * lb + j] = sum;
+                                         }
+                                     }
+
+                                     do_send_result_chunk(c, indexes);
+                                 }
                              }
                              else {
                                  std::cout << "socket closed on do_read_result_body" << ec.message();
@@ -115,6 +155,33 @@ private:
                               }
                           });
     }
+
+    void do_send_result_chunk(std::vector<int> matrix, std::vector<char> indexes) {
+        std::vector<char> result; result.reserve(matrix.size()*sizeof(int) + indexes.size());
+
+        result.insert(result.end(), indexes.begin(), indexes.end());
+        std::memcpy(&(result[indexes.size()]), matrix.data(), matrix.size()*sizeof(int));
+
+        data_model frame(CommandType::DotProductChunk, result);
+
+        std::vector<char> buff = frame.serialize_frame();
+        //std::cout << "created data of size: " << buff.size() << std::endl;
+
+        auto self(shared_from_this());
+        asio::async_write(socket_,
+                          asio::buffer(buff.data(), buff.size()),
+                          [this, self, buff](std::error_code ec, std::size_t /*length*/) {
+                              if (!ec) {
+                                  std::cout << "sent result: ";
+                                  for (int i = 0; i < buff.size(); i++)
+                                      std::cout << (int) buff[i] << " ";
+                                  std::cout << std::endl << "waiting for next frame...";
+
+                                  do_read_header();
+                              }
+                          });
+    }
+
 
 // math
 

@@ -67,6 +67,22 @@ public:
     }
 
     inline
+    matrix<T> get_rows(int row, int n) {
+        matrix<T> result(n, cols_);
+        std::memcpy(result.get_data().data(), &(data[row * cols_]), cols_ * n * sizeof(T));
+        return result;
+    }
+
+    inline
+    matrix<T> get_cols(int col, int n) {
+        matrix<T> result(rows_, n);
+        for (int i = 0; i < rows_; i++)
+            std::memcpy(result.get_data().data() + n*i, &(data[cols_ * i + col]), n * sizeof(T));
+
+        return result;
+    }
+
+    inline
     int index_to_row(int a) { return a / rows_; }
 
     inline
@@ -88,7 +104,7 @@ public:
     void print() {
         for (int a = 0; a < rows_ * cols_; a++) {
             std::cout << (int) data[a] << " ";
-            if ((a + 1) % rows_ == 0) std::cout << std::endl;
+            if ((a + 1) % cols_ == 0) std::cout << std::endl;
         }
     }
 
