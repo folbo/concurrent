@@ -126,10 +126,10 @@ public:
         matrix<int> transposed(b);
         //transposed.transpose();
 
-        a.print();
-        std::cout << std::endl;
-        transposed.print();
-        std::cout << std::endl;
+        //a.print();
+        //std::cout << std::endl;
+        //transposed.print();
+        //std::cout << std::endl;
         transposed.transpose();
 
         int bytes_of_b = transposed.get_data().size()*sizeof(int);
@@ -252,6 +252,14 @@ private:
                    (unsigned char) (buffer[1]) << 8 |
                    (unsigned char) (buffer[0]));
     }
+
+    unsigned int get_uint(const char *buffer) {
+        return unsigned((unsigned char) (buffer[3]) << 24 |
+                   (unsigned char) (buffer[2]) << 16 |
+                   (unsigned char) (buffer[1]) << 8 |
+                   (unsigned char) (buffer[0]));
+    }
+
 
     std::vector<char> get_bytes_int(int obj) {
         std::vector<char> v(sizeof(int));

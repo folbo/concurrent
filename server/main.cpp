@@ -7,7 +7,7 @@
  */
 int main(int argc, char **argv) {
     try {
-        int m = 10, n = 10, l = 10;
+        int m = 400, n = 400, l = 400;
         // 0 1 2 3 4 5 6 7 8 9
         // 10 11 12 13 14 15 16 17 18 19
         // 20 21 22 23 24 25 26 27 28 29
@@ -19,22 +19,22 @@ int main(int argc, char **argv) {
         // 6 7 8
         matrix<int> m1(m, l);
         for (int i = 0; i < m*l; i++)
-            m1(i / l, i % l) = i;
+            m1(i / l, i % l) = 1;
         //std::cout << "m1 : \n";
-        m1.print();
+        //m1.print();
 
         // 0 1 2
         // 3 4 5
         // 6 7 8
         matrix<int> m2(n, l);
         for (int i = 0; i < n*l; i++)
-            m2(i / l, i % l) = i;
+            m2(i / l, i % l) = 1;
         //std::cout << "m2 : \n";
         // 0 3 6
         // 1 4 7
         // 2 5 8
         m2.transpose();
-        m2.print();
+        //m2.print();
         // 0 1 2    0 3 6      5    14  23
         // 3 4 5  x 1 4 7   =  14   50  86
         // 6 7 8    2 5 8      23   86  149
@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
             }
             if (input == "r") {
                 std::cout << "begin chunked calculation " << s.workers_count() << std::endl;
-                s.begin_mul_chunked(m1, m2, 3, 3);
+                s.begin_mul_chunked(m1, m2, 5, 5);
             }
             if (input == "q")
                 break;

@@ -70,6 +70,7 @@ public:
                 //std::this_thread::sleep_for(std::chrono::seconds(10));
             }
 
+            //last row chunk
             int last_chunk_size_a = m1.rows() % chunk_size_a;
             int row = j * chunk_size_a;
             auto chunk1 = m1.get_rows(row, last_chunk_size_a);
@@ -92,7 +93,6 @@ public:
 
             ad++;
             ad %= n;
-            //std::this_thread::sleep_for(std::chrono::seconds(10));
         }
         int last_chunk_size_a = m1.rows() % chunk_size_a;
         int row = j * chunk_size_a;

@@ -36,7 +36,7 @@ private:
                          asio::buffer(data_, 5),
                          [this, self](std::error_code ec, std::size_t length) {
                              if (!ec) {
-                                 int data_length = get_int(data_ + 1);
+                                 int data_length = get_uint(data_ + 1);
                                  //std::cout << "read len: " << data_length << std::endl;
 
                                  do_read_body(data_length);
@@ -91,12 +91,12 @@ private:
                                      int size = get_int(&(data_[21]));
                                      std::cout << size << std::endl;
 
-                                     std::cout << "frame: ";
-                                     for(int i=5; i < 5 + length; ++i) {
-                                         std::cout << std::hex << (int) data_[i];
-                                     }
+                                     //std::cout << "frame: ";
+                                     //for(int i=5; i < 5 + length; ++i) {
+                                     //    std::cout << std::hex << (int) data_[i];
+                                     //}
 
-                                     std::cout << std::dec << std::endl;
+                                     //std::cout << std::dec << std::endl;
 
                                      std::vector<char> indexes(20);
                                      std::memcpy(indexes.data(), &(data_[5]), 20);
@@ -113,16 +113,16 @@ private:
                                      std::vector<int> c(la*lb);
 
                                      //print A
-                                     for (int a = 0; a < la * size; a++) {
-                                         std::cout << *( reinterpret_cast<int*>(a_start + a*sizeof(int)) )<< " ";
-                                         if ((a + 1) % size == 0) std::cout << std::endl;
-                                     }
+                                     //for (int a = 0; a < la * size; a++) {
+                                     //    /std::cout << *( reinterpret_cast<int*>(a_start + a*sizeof(int)) )<< " ";
+                                     //    if ((a + 1) % size == 0) std::cout << std::endl;
+                                     //}
 
-                                     //print A
-                                     for (int b = 0; b < lb * size; b++) {
-                                         std::cout << *( reinterpret_cast<int*>(b_start + b*sizeof(int)) )<< " ";
-                                         if ((b + 1) % size == 0) std::cout << std::endl;
-                                     }
+                                     //print B
+                                     //for (int b = 0; b < lb * size; b++) {
+                                     //    std::cout << *( reinterpret_cast<int*>(b_start + b*sizeof(int)) )<< " ";
+                                     //    if ((b + 1) % size == 0) std::cout << std::endl;
+                                     //}
 
                                      for(int i = 0; i < la; i++){ //row
                                          for(int j = 0; j < lb; j++){ //col
@@ -133,7 +133,7 @@ private:
                                              for(int k = 0; k < size; k++){ //col
                                                 sum += ptr_a[k] * ptr_b[k];
                                              }
-                                             std::cout << "c[" << i * lb + j << "]" << std::endl;
+                                             //std::cout << "c[" << i * lb + j << "]" << std::endl;
                                              c[i * lb + j] = sum;
                                          }
                                      }
@@ -206,6 +206,13 @@ private:
                    (unsigned char) (buffer[2]) << 16 |
                    (unsigned char) (buffer[1]) << 8 |
                    (unsigned char) (buffer[0]));
+    }
+
+    unsigned int get_uint(const char *buffer) {
+        return unsigned((unsigned char) (buffer[3]) << 24 |
+                        (unsigned char) (buffer[2]) << 16 |
+                        (unsigned char) (buffer[1]) << 8 |
+                        (unsigned char) (buffer[0]));
     }
 
     std::vector<char> get_bytes_int(int obj) {
