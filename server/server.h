@@ -53,6 +53,19 @@ public:
         int n = workers.size();
         int ad = 0;
 
+        // auto
+        if(chunk_size_a == -1){
+            chunk_size_a = m1.rows() / n;
+            std::cout << "auto-sizing A chunks: sending chunks of" << chunk_size_a << " rows from A." << std::endl;
+        }
+
+        if(chunk_size_b == -1){
+            chunk_size_b = m1.cols() / n;
+            std::cout << "auto-sizing B chunks: sending chunks of" << chunk_size_b << " cols from B." << std::endl;
+        }
+
+
+
         int i = 0;
         for(; i < m2.cols() / chunk_size_b; i++){
             int col = i * chunk_size_b; //col + chunk_size_b - ostatnia kolumna chunka
@@ -99,7 +112,13 @@ public:
         auto chunk1 = m1.get_rows(row, last_chunk_size_a);
 
         workers[ad]->command_mul_chunked(chunk1, chunk2, row, col, last_chunk_size_a, last_chunk_size_b, m1.cols());
+    }
 
+    bool check_done(){
+        if (std::any_of(workers.cbegin(), workers.cend(),
+                        [](const std::shared_ptr<worker_session> &worker) { return worker->check_done() == false; }))
+            return false;
+        return true;
     }
 
 

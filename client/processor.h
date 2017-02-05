@@ -36,9 +36,7 @@ private:
                          asio::buffer(data_, 5),
                          [this, self](std::error_code ec, std::size_t length) {
                              if (!ec) {
-                                 int data_length = get_uint(data_ + 1);
-                                 //std::cout << "read len: " << data_length << std::endl;
-
+                                 unsigned int data_length = get_uint(data_ + 1);
                                  do_read_body(data_length);
                              }
                              else {
@@ -54,17 +52,9 @@ private:
                          asio::buffer(data_ + 5, data_length),
                          [this, self](std::error_code ec, std::size_t length) {
                              if (!ec) {
-                                 //std::cout << "read frame ";
-                                 //for (int i = 0; i < 5 + length; i++)
-                                 //    std::cout << (int) data_[i] << " ";
-                                 //std::cout << std::endl;
-
                                  if (data_[0] == 3) // dot product
                                  {
-                                     // number of elements in row/col
-                                     int size = get_int(&(data_[13]));
-                                     //std::cout << size << std::endl;
-
+                                     unsigned int size = get_uint(&(data_[13]));
 
                                      std::vector<char> indexes(8);
                                      std::memcpy(indexes.data(), &(data_[5]), 8);
@@ -80,29 +70,20 @@ private:
                                          sum += a[k] * b[k];
                                      }
 
-                                     //std::cout << sum << std::endl;
-
                                      do_send_result(sum, indexes);
                                  }
 
                                  if (data_[0] == 4) // dot product
                                  {
                                      // number of elements in row/col
-                                     int size = get_int(&(data_[21]));
+                                     unsigned int size = get_uint(&(data_[21]));
                                      std::cout << size << std::endl;
-
-                                     //std::cout << "frame: ";
-                                     //for(int i=5; i < 5 + length; ++i) {
-                                     //    std::cout << std::hex << (int) data_[i];
-                                     //}
-
-                                     //std::cout << std::dec << std::endl;
 
                                      std::vector<char> indexes(20);
                                      std::memcpy(indexes.data(), &(data_[5]), 20);
 
-                                     int la = get_int(&(data_[13]));
-                                     int lb = get_int(&(data_[17]));
+                                     unsigned int la = get_uint(&(data_[13]));
+                                     unsigned int lb = get_uint(&(data_[17]));
 
                                      std::vector<int> a(size*la);
                                      std::vector<int> b(size*lb);
@@ -124,8 +105,8 @@ private:
                                      //    if ((b + 1) % size == 0) std::cout << std::endl;
                                      //}
 
-                                     for(int i = 0; i < la; i++){ //row
-                                         for(int j = 0; j < lb; j++){ //col
+                                     for(unsigned int i = 0; i < la; i++){ //row
+                                         for(unsigned int j = 0; j < lb; j++){ //col
                                              int* ptr_a = reinterpret_cast<int*>(a_start + i * size * sizeof(int));
                                              int* ptr_b = reinterpret_cast<int*>(b_start + j * size * sizeof(int));
 
@@ -133,7 +114,7 @@ private:
                                              for(int k = 0; k < size; k++){ //col
                                                 sum += ptr_a[k] * ptr_b[k];
                                              }
-                                             //std::cout << "c[" << i * lb + j << "]" << std::endl;
+
                                              c[i * lb + j] = sum;
                                          }
                                      }
@@ -162,11 +143,6 @@ private:
                           asio::buffer(buff.data(), buff.size()),
                           [this, self, buff](std::error_code ec, std::size_t /*length*/) {
                               if (!ec) {
-                                  //std::cout << "sent result: ";
-                                  //for (int i = 0; i < buff.size(); i++)
-                                  //    std::cout << (int) buff[i] << " ";
-                                  //std::cout << std::endl << "waiting for next frame...";
-
                                   do_read_header();
                               }
                           });
@@ -181,7 +157,6 @@ private:
         data_model frame(CommandType::DotProductChunk, result);
 
         std::vector<char> buff = frame.serialize_frame();
-        //std::cout << "created data of size: " << buff.size() << std::endl;
 
         auto self(shared_from_this());
         asio::async_write(socket_,
@@ -189,8 +164,8 @@ private:
                           [this, self, buff](std::error_code ec, std::size_t /*length*/) {
                               if (!ec) {
                                   std::cout << "sent result: ";
-                                  for (int i = 0; i < buff.size(); i++)
-                                      std::cout << (int) buff[i] << " ";
+                                  //for (int i = 0; i < buff.size(); i++)
+                                  //    std::cout << (int) buff[i] << " ";
                                   std::cout << std::endl << "waiting for next frame...";
 
                                   do_read_header();
@@ -226,15 +201,13 @@ private:
 
 private:
     enum {
-        max_length = 4096
+        max_length = 1000000
     };
 
     tcp::socket socket_;
     char data_[max_length];
 
     std::deque<data_model> process_queue;
-
-    std::vector<std::future<void>> results;
 };
 
 #endif	/* PROCESSOR_H */

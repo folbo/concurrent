@@ -15,6 +15,16 @@ enum class CommandType {
     DotProductChunked = 4
 };
 
+struct result {
+    result(int r, int c) : row{r}, col{c}, calculated{false}
+    {
+    }
+
+    int row;
+    int col;
+    bool calculated;
+};
+
 class worker_session : public std::enable_shared_from_this<worker_session> {
 
     using tcp = asio::ip::tcp;
@@ -89,47 +99,39 @@ public:
     }
 
 
-    void command_mul_chunked(matrix<int> a, matrix<int> b, int x, int y, int la, int lb, int n)
+    void command_mul_chunked(matrix<int> a, matrix<int> b, unsigned int x, unsigned int y, unsigned int la, unsigned int lb, unsigned int n)
     {
         //serialize to bytes
-        int data_size = a.rows()*a.cols()*sizeof(int) + b.rows()*b.cols()*sizeof(int) + 5 * sizeof(int);
-        //std::cout << "data size: " << data_size << std::endl;
+        unsigned int data_size = a.rows()*a.cols()*sizeof(int) + b.rows()*b.cols()*sizeof(int) + 5 * sizeof(int);
         std::vector<char> d(5 + data_size);
 
         //append header frame info
         d[0] = ((unsigned char) CommandType::DotProductChunked);
 
         auto len = get_bytes_int(data_size);
-        std::memcpy(&(d[1]), len.data(), sizeof(int));
+        std::memcpy(&(d[1]), len.data(), sizeof(unsigned int));
 
         // body 1 + 4 + 5*4 = 25
         auto x_v = get_bytes_int(x); //int result row
-        std::memcpy(&(d[5]), x_v.data(), sizeof(int));
+        std::memcpy(&(d[5]), x_v.data(), sizeof(unsigned int));
 
         auto y_v = get_bytes_int(y); //int result col
-        std::memcpy(&(d[9]), y_v.data(), sizeof(int));
+        std::memcpy(&(d[9]), y_v.data(), sizeof(unsigned int));
 
         auto la_v = get_bytes_int(la); //int height of 1st matrix
-        std::memcpy(&(d[13]), la_v.data(), sizeof(int));
+        std::memcpy(&(d[13]), la_v.data(), sizeof(unsigned int));
 
         auto lb_v = get_bytes_int(lb); //int width of 2nd matrix
-        std::memcpy(&(d[17]), lb_v.data(), sizeof(int));
+        std::memcpy(&(d[17]), lb_v.data(), sizeof(unsigned int));
 
         auto n_v = get_bytes_int(n); //int common length
-        std::memcpy(&(d[21]), n_v.data(), sizeof(int));
+        std::memcpy(&(d[21]), n_v.data(), sizeof(unsigned int));
         // append 2 vectors to buffer
-
 
         int bytes_of_a = a.get_data().size()*sizeof(int);
         std::memcpy(&(d[25]), a.get_data().data(), bytes_of_a);
 
         matrix<int> transposed(b);
-        //transposed.transpose();
-
-        //a.print();
-        //std::cout << std::endl;
-        //transposed.print();
-        //std::cout << std::endl;
         transposed.transpose();
 
         int bytes_of_b = transposed.get_data().size()*sizeof(int);
@@ -137,9 +139,6 @@ public:
 
         //print
         std::cout << "sending" << std::endl;
-        //for (int i = 0; i < d.size(); i++)
-        //    std::cout << (int) d[i] << " ";
-        //std::cout << std::endl;
 
         //write
         bool write_in_progress = !output_deq.empty();
@@ -148,7 +147,13 @@ public:
             do_write();
         }
 
-        is_working = true;
+        processing_++;
+        results.emplace_back(result(x, y));
+    }
+
+    bool check_done(){
+        return !std::any_of(results.cbegin(), results.cend(),
+                            [](const result &res) { return !res.calculated; });
     }
 
 private:
@@ -157,7 +162,6 @@ private:
                           asio::buffer(output_deq.front().data(), output_deq.front().size()),
                           [this](std::error_code ec, std::size_t /*length*/) {
                               if (!ec) {
-                                  //std::cout << "do_write" << std::endl;
                                   output_deq.pop_front();
 
                                   if(!output_deq.empty())
@@ -175,15 +179,7 @@ private:
                          asio::buffer(data_read_, 5),
                          [this](std::error_code ec, std::size_t length) {
                              if (!ec) {
-                                 //std::cout << "do_read__result_header" << std::endl;
-                                 //std::cout << "read: " << length <<  " bytes, [] = ";
-                                 //for (int i = 0; i < 5; i++)
-                                 //    std::cout << (int) data_read_[i] << " ";
-                                 //std::cout << std::endl;
-
                                  int data_length = get_int(data_read_ + 1);
-
-                                 //std::cout << "received result. data_length = : " << data_length << ". reading body..." << std::endl;
 
                                  do_read_result_body(data_length);
                              }
@@ -199,12 +195,6 @@ private:
                          asio::buffer(data_read_ + 5, data_length),
                          [this](std::error_code ec, std::size_t length) {
                              if (!ec) {
-                                 //std::cout << "do_read__result_body" << std::endl;
-                                 //std::cout << "received body :";
-                                 //for (int i = 0; i < 5 + length; i++)
-                                 //    std::cout << (int) data_read_[i] << " ";
-                                 //std::cout << std::endl;
-
                                  char d[length];
                                  std::memcpy(d, &(data_read_[5]), length);
 
@@ -231,20 +221,34 @@ private:
     }
 
     void handle_result_chunk(char* data) {
-        int row = get_int(&(data[0]));
-        int col = get_int(&(data[4]));
-        int la = get_int(&(data[8]));
-        int lb = get_int(&(data[12]));
-        int n = get_int(&(data[16]));
+        unsigned int row = get_uint(&(data[0]));
+        unsigned int col = get_uint(&(data[4]));
+        unsigned int la = get_uint(&(data[8]));
+        unsigned int lb = get_uint(&(data[12]));
+        unsigned int n = get_uint(&(data[16]));
 
-        matrix<int> part(la,lb);
-        std::memcpy(part.get_data().data(), &(data[20]), la*lb*sizeof(int));
+        matrix<int> part(la, lb);
+        std::memcpy(part.get_data().data(), &(data[20]), la * lb * sizeof(int));
         //part.print();
 
         std::cout << "patching: row=" << row << ", col=" << col << std::endl;
 
         output_matrix.patch(part, row, col);
+
+        auto res_it = std::find_if(results.begin(),
+                                   results.end(),
+                                   [&row, &col](const result& res)
+                                   {
+                                       return res.row == row && res.col == col;
+                                   });
+        if(res_it == results.end()){
+            exit(-4);
+        }
+
+        res_it->calculated = true;
     }
+
+
 
     int get_int(const char *buffer) {
         return int((unsigned char) (buffer[3]) << 24 |
@@ -255,11 +259,10 @@ private:
 
     unsigned int get_uint(const char *buffer) {
         return unsigned((unsigned char) (buffer[3]) << 24 |
-                   (unsigned char) (buffer[2]) << 16 |
-                   (unsigned char) (buffer[1]) << 8 |
-                   (unsigned char) (buffer[0]));
+                        (unsigned char) (buffer[2]) << 16 |
+                        (unsigned char) (buffer[1]) << 8 |
+                        (unsigned char) (buffer[0]));
     }
-
 
     std::vector<char> get_bytes_int(int obj) {
         std::vector<char> v(sizeof(int));
@@ -270,15 +273,25 @@ private:
         return v;
     }
 
+    std::vector<char> get_bytes_uint64(uint64_t obj) {
+        std::vector<char> v(sizeof(int));
+        for (unsigned i = 0; i < sizeof(uint64_t); ++i) {
+            v[i] = obj & 0xFF;
+            obj >>= 8;
+        }
+        return v;
+    }
+
 private:
     enum {
-        max_length = 4096
+        max_length = 1000000
     };
 
     tcp::socket socket_;
     char data_read_[max_length];
-    char data_write_[max_length];
-    int max_threads;
+
+    int processing_ = 0;
+    std::list<result> results;
 };
 
 #endif	/* WORKER_SESSION_H */
