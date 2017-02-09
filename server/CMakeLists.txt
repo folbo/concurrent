@@ -28,6 +28,6 @@ include_directories(${Asio_INCLUDE_DIR})
 add_subdirectory(./../ThreadPool ThreadPool)
 include_directories(${THREADPOOL_LIB_INCLUDE_DIR})
 
-add_executable (${exe_name} main.cpp worker_session.h server.h matrix.h)
+add_executable (${exe_name} main.cpp worker_session.h server.h matrix.h protocol/dotprod_frame.h protocol/frame.h protocol/chunk_frame.h protocol/chunk_response.h)
 
 target_link_libraries (${exe_name} ws2_32 wsock32)
