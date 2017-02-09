@@ -1,10 +1,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
-#include <asio.hpp>
-#include <thread>
-#include <future>
 #include <chrono>
+#include <asio.hpp>
 #include "client.h"
 
 class InputParser{

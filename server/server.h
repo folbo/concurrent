@@ -1,13 +1,10 @@
 #ifndef SERVER_H
 #define    SERVER_H
 
-#include "ThreadPool.h"
-#include <thread>
-#include <future>
-#include <chrono>
 #include <iostream>
-#include <asio.hpp>
+#include <chrono>
 #include <deque>
+#include <asio.hpp>
 #include "worker_session.h"
 #include "matrix.h"
 

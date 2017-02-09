@@ -4,14 +4,11 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
-#include <asio.hpp>
-#include <thread>
-#include <future>
 #include <chrono>
-#include <deque>
-#include <array>
-#include "data_model.h"
 #include <utility>
+#include <deque>
+#include <asio.hpp>
+#include "data_model.h"
 
 class processor : public std::enable_shared_from_this<processor> {
 
