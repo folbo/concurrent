@@ -1,8 +1,8 @@
-#include <vector>
-#include <iostream>
-
 #ifndef DATA_MODEL_H
 #define	DATA_MODEL_H
+
+#include <vector>
+#include <iostream>
 
 enum class CommandType {
     Hello = 1,

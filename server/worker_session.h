@@ -1,3 +1,6 @@
+#ifndef WORKER_SESSION_H
+#define    WORKER_SESSION_H
+
 #include <asio.hpp>
 #include <iostream>
 #include <vector>
@@ -9,10 +12,6 @@
 #include "protocol/chunk_frame.h"
 #include "protocol/dotprod_frame.h"
 #include "protocol/chunk_response.h"
-
-#ifndef WORKER_SESSION_H
-#define    WORKER_SESSION_H
-
 
 struct result {
     result(int r, int c) :

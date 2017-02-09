@@ -1,3 +1,6 @@
+#ifndef PROCESSOR_H
+#define    PROCESSOR_H
+
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -9,10 +12,6 @@
 #include <array>
 #include "data_model.h"
 #include <utility>
-
-#ifndef PROCESSOR_H
-#define    PROCESSOR_H
-
 
 class processor : public std::enable_shared_from_this<processor> {
 

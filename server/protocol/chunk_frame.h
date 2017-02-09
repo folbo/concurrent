@@ -1,7 +1,7 @@
-#include "frame.h"
-
 #ifndef PROJECT_CHUNK_FRAME_H
 #define PROJECT_CHUNK_FRAME_H
+
+#include "frame.h"
 
 struct chunk_frame : public frame<int> {
     chunk_frame(unsigned int row, unsigned int col, unsigned int h, unsigned int w, unsigned int l, matrix<int>& a, matrix<int>& b) :

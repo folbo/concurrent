@@ -1,3 +1,6 @@
+#ifndef SERVER_H
+#define    SERVER_H
+
 #include "ThreadPool.h"
 #include <thread>
 #include <future>
@@ -7,9 +10,6 @@
 #include <deque>
 #include "worker_session.h"
 #include "matrix.h"
-
-#ifndef SERVER_H
-#define    SERVER_H
 
 class server {
 

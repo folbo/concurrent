@@ -1,8 +1,8 @@
-#include <vector>
-#include <exception>
-
 #ifndef MATRIX_H
 #define MATRIX_H
+
+#include <vector>
+#include <exception>
 
 template <typename T>
 class matrix {

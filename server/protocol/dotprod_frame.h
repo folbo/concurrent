@@ -1,8 +1,7 @@
-#include "frame.h"
-
 #ifndef PROJECT_DOTPROD_FRAME_H
 #define PROJECT_DOTPROD_FRAME_H
 
+#include "frame.h"
 
 struct dotprod_frame : public frame<int> {
     dotprod_frame(unsigned int row, unsigned int col, unsigned int l, std::vector<int>& a, std::vector<int>& b) :
