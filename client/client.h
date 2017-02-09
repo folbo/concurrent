@@ -1,8 +1,8 @@
-#include <asio.hpp>
-#include "processor.h"
-
 #ifndef CLIENT_H
 #define	CLIENT_H
+
+#include <asio.hpp>
+#include "processor.h"
 
 class client {
 
