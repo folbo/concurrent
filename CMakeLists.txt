@@ -14,7 +14,7 @@ endfunction(VerifyVarDefined)
 
 
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "-std=c++11")
 
 # set VAR for boost dependency
 find_package(Boost 1.57.0 REQUIRED)
