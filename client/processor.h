@@ -71,15 +71,18 @@ private:
 
                                  if (data_[0] == 4) // dot product
                                  {
+
+                                     unsigned int row = get_uint(&(data_[5]));
+                                     unsigned int col = get_uint(&(data_[9]));
+                                     unsigned int la = get_uint(&(data_[13]));
+                                     unsigned int lb = get_uint(&(data_[17]));
                                      // number of elements in row/col
                                      unsigned int size = get_uint(&(data_[21]));
-                                     std::cout << size << std::endl;
+
+                                     std::cout << "row: " << row << ", col: " << col << ", length: " << size << std::endl;
 
                                      std::vector<char> indexes(20);
                                      std::memcpy(indexes.data(), &(data_[5]), 20);
-
-                                     unsigned int la = get_uint(&(data_[13]));
-                                     unsigned int lb = get_uint(&(data_[17]));
 
                                      std::vector<int> a(size*la);
                                      std::vector<int> b(size*lb);
@@ -157,12 +160,12 @@ private:
         auto self(shared_from_this());
         asio::async_write(socket_,
                           asio::buffer(buff.data(), buff.size()),
-                          [this, self, buff](std::error_code ec, std::size_t /*length*/) {
+                          [this, self, buff](std::error_code ec, std::size_t length) {
                               if (!ec) {
-                                  std::cout << "sent result: ";
+                                  std::cout << "sent result";
                                   //for (int i = 0; i < buff.size(); i++)
                                   //    std::cout << (int) buff[i] << " ";
-                                  std::cout << std::endl << "waiting for next frame...";
+                                  std::cout << std::endl << "waiting for next frame..." << std::endl;
 
                                   do_read_header();
                               }

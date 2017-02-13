@@ -17,7 +17,8 @@ public:
     server(asio::io_service &io_service, short port, matrix<int>& m) :
             acceptor_(io_service, tcp::endpoint(tcp::v4(), port)),
             socket_(io_service),
-            output_matrix{m} {
+            output_matrix{m},
+            io_service_{io_service} {
         do_accept();
     }
 
@@ -60,7 +61,6 @@ public:
             chunk_size_b = m1.cols() / n;
             std::cout << "auto-sizing B chunks: sending chunks of" << chunk_size_b << " cols from B." << std::endl;
         }
-
 
 
         int i = 0;
@@ -125,7 +125,7 @@ private:
         acceptor_.async_accept(socket_,
                                [this](std::error_code ec) {
                                    if (!ec) {
-                                       auto w = std::make_shared<worker_session>(std::move(socket_), output_matrix);
+                                       auto w = std::make_shared<worker_session>(io_service_, std::move(socket_), output_matrix);
                                        workers.emplace_back(w);
                                        w->start();
                                    }
@@ -143,6 +143,7 @@ private:
 
     tcp::acceptor acceptor_;
     tcp::socket socket_;
+    asio::io_service& io_service_;
 
     std::vector<std::shared_ptr<worker_session>> workers;
 };

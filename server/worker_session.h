@@ -34,9 +34,10 @@ class worker_session : public std::enable_shared_from_this<worker_session> {
 
     matrix<int>& output_matrix;
 public:
-    worker_session(tcp::socket socket, matrix<int>& output) :
+    worker_session(asio::io_service& io_service, tcp::socket socket, matrix<int>& output) :
             socket_(std::move(socket)),
-            output_matrix{output} {
+            output_matrix{output},
+            io_service_{io_service} {
         //
     }
 
@@ -50,23 +51,26 @@ public:
 
     void command_mul(std::vector<int> &a, std::vector<int> &b, int x, int y, int l)
     {
-        //print
-        std::cout << "sending" << std::endl;
+        auto d = dotprod_frame(x, y, l, a, b).get_data();
 
-        //write
-        bool write_in_progress = !output_deq.empty();
-        output_deq.push_back(dotprod_frame(x, y, l, a, b).get_data());
+        io_service_.post(
+                [this, d]() {
+                    std::cout << "sending" << std::endl;
 
-        if (!write_in_progress) {
-            do_write();
-        }
+                    //write
+                    bool write_in_progress = !output_deq.empty();
+                    output_deq.push_back(d);
+
+                    if (!write_in_progress) {
+                        do_write();
+                    }
+                });
     }
-
 
     void command_mul_chunked(matrix<int> a, matrix<int> b, unsigned int x, unsigned int y, unsigned int la, unsigned int lb, unsigned int n)
     {
         //print
-        std::cout << "sending" << std::endl;
+        std::cout << "sending row: " << x << ", col: " << y << std::endl;
 
         //write
         bool write_in_progress = !output_deq.empty();
@@ -127,9 +131,9 @@ private:
                                  std::memcpy(d, &(data_read_[5]), length);
 
                                  if(data_read_[0] == (char)CommandType::DotProduct)
-                                    handle_result_dotproduct(d);
+                                     handle_result_dotproduct(d);
                                  if(data_read_[0] == (char)CommandType::DotProductChunked)
-                                    handle_result_chunk(d);
+                                     handle_result_chunk(d);
 
                                  do_read_result_header();
                              }
@@ -192,9 +196,11 @@ private:
     };
 
     tcp::socket socket_;
+    asio::io_service& io_service_;
+
     char data_read_[max_length];
 
-    int processing_ = 0;
+
     std::list<result> results;
 };
 

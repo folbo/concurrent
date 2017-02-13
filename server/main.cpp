@@ -94,7 +94,6 @@ int main(int argc, char **argv) {
         n = std::stoi(b_cols_s);
     }
 
-
     std::cout << "on port: " << port << std::endl;
 
     std::cout << "A chunk size: " << ((chunks_size_a == -1) ? "auto" : std::to_string(chunks_size_a)) << std::endl;
@@ -141,12 +140,12 @@ int main(int argc, char **argv) {
                 s.begin_mul(m1, m2);
             }
             else if (input == "r") {
-                std::cout << "distributed chunked calculation..." << std::endl;
+                std::cout << "distributed chunked calculation... " << s.workers_count() << std::endl;
                 std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
                 s.begin_mul_chunked(m1, m2, chunks_size_a, chunks_size_b);
 
-                while(!s.check_done()){
+                while(!s.check_done()) {
                     std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 }
 
