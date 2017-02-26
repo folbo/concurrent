@@ -69,18 +69,21 @@ public:
 
     void command_mul_chunked(matrix<int> a, matrix<int> b, unsigned int x, unsigned int y, unsigned int la, unsigned int lb, unsigned int n)
     {
-        //print
-        std::cout << "sending row: " << x << ", col: " << y << std::endl;
+        auto chunk_bytes = chunk_frame(x, y, la, lb, n, a, b).get_data();
 
-        //write
-        bool write_in_progress = !output_deq.empty();
-        output_deq.emplace_back(chunk_frame(x, y, la, lb, n, a, b).get_data());
+        io_service_.post(
+                [this, chunk_bytes, x, y]() {
+                    std::cout << "sending row: " << x << ", col: " << y << std::endl;
 
-        if (!write_in_progress) {
-            do_write();
-        }
+                    bool write_in_progress = !output_deq.empty();
+                    output_deq.emplace_back(chunk_bytes);
 
-        results.emplace_back(result(x, y));
+                    if (!write_in_progress) {
+                        do_write();
+                    }
+
+                    results.emplace_back(result(x, y));
+                });
     }
 
     bool check_done(){

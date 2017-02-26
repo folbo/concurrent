@@ -19,7 +19,7 @@ struct frame {
     char type;
     unsigned int data_length;
 
-    std::vector<char> get_bytes_int(int obj) {
+    std::vector<char> get_bytes_int(int obj) const {
         std::vector<char> v(sizeof(int));
         for (unsigned i = 0; i < sizeof(int); ++i) {
             v[i] = obj & 0xFF;
