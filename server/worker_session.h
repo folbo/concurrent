@@ -55,7 +55,7 @@ public:
 
         io_service_.post(
                 [this, d]() {
-                    std::cout << "sending" << std::endl;
+                    //std::cout << "sending" << std::endl;
 
                     //write
                     bool write_in_progress = !output_deq.empty();
@@ -73,7 +73,7 @@ public:
 
         io_service_.post(
                 [this, chunk_bytes, x, y]() {
-                    std::cout << "sending row: " << x << ", col: " << y << std::endl;
+                    //std::cout << "sending row: " << x << ", col: " << y << std::endl;
 
                     bool write_in_progress = !output_deq.empty();
                     output_deq.emplace_back(chunk_bytes);
@@ -159,7 +159,7 @@ private:
 
         chunk_response response(data);
 
-        std::cout << "patching: row=" << response.row << ", col=" << response.col << std::endl;
+        //std::cout << "patching: row=" << response.row << ", col=" << response.col << std::endl;
 
         output_matrix.patch(*response.result.get(), response.row, response.col);
 

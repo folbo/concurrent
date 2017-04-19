@@ -7,15 +7,16 @@
       <sourceFolder url="file://$MODULE_DIR$/client/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/client/client.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/client/data_model.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/server/matrix.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/server/protocol/dotprod_frame.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/server/protocol/chunk_response.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/server/protocol/chunk_frame.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/server/protocol/frame.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/server/server.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/server/main.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/server/matrix.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/server/worker_session.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/server/CMakeLists.txt" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/server/server.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/ThreadPool/CMakeLists.txt" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/ThreadPool/ThreadPool.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/ThreadPool/ThreadPool.cpp" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
