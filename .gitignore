@@ -42,5 +42,6 @@ CTestTestfile.cmake
 *.out
 *.app
 
-bin/
-nbproject/
+*/bin/
+*/nbproject/
+*/.idea/
