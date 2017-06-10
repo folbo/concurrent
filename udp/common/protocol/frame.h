@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <string>
+#include "../udp_too_big_exception.h"
 
 enum class CommandType {
     Hello = 1,

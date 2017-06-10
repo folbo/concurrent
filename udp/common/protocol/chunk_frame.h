@@ -16,6 +16,9 @@ struct chunk_frame : public frame {
                       4 + //sizeof(l)
                       a.rows()*a.cols() * 4 + //a.rows()*a.cols() * sizeof(int)
                       b.rows()*b.cols() * 4;  //b.rows()*b.cols() * sizeof(int);
+
+        if(5 + data_length > 8192)
+            throw udp_too_big_exception();
     }
 
     std::vector<char> get_data() {

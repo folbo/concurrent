@@ -50,13 +50,43 @@ public:
             std::cout << "auto-sizing B chunks: sending chunks of" << chunk_size_b << " cols from B." << std::endl;
         }
 
-        int i = 0;
-        for(; i < m2.cols() / chunk_size_b; i++){
+
+        try {
+            int i = 0;
+            for (; i < m2.cols() / chunk_size_b; i++) {
+                int col = i * chunk_size_b; //col + chunk_size_b - ostatnia kolumna chunka
+                auto chunk2 = m2.get_cols(col, chunk_size_b);
+
+                int j = 0;
+                for (; j < m1.rows() / chunk_size_a; j++) {
+                    int row = j * chunk_size_a;
+                    auto chunk1 = m1.get_rows(row, chunk_size_a);
+
+                    chunk_frame dto(row, col, chunk_size_a, chunk_size_b, m1.cols(), chunk1, chunk2);
+                    sessions_[ad]->send_data(dto.get_data());
+
+                    ad++;
+                    ad %= n;
+                    //std::this_thread::sleep_for(std::chrono::seconds(10));
+                }
+
+                //last row chunk
+                int last_chunk_size_a = m1.rows() % chunk_size_a;
+                int row = j * chunk_size_a;
+                auto chunk1 = m1.get_rows(row, last_chunk_size_a);
+
+                chunk_frame dto(row, col, chunk_size_a, chunk_size_b, m1.cols(), chunk1, chunk2);
+                sessions_[ad]->send_data(dto.get_data());
+            }
+
+            //last column chunk
+            int last_chunk_size_b = m2.cols() % chunk_size_b;
             int col = i * chunk_size_b; //col + chunk_size_b - ostatnia kolumna chunka
-            auto chunk2 = m2.get_cols(col, chunk_size_b);
+            auto chunk2 = m2.get_cols(col, last_chunk_size_b);
 
             int j = 0;
-            for(; j < m1.rows() / chunk_size_a; j++){
+            for (; j < m1.rows() / chunk_size_a; j++) {
+                int last_chunk_size_a = m1.rows() % chunk_size_a;
                 int row = j * chunk_size_a;
                 auto chunk1 = m1.get_rows(row, chunk_size_a);
 
@@ -65,10 +95,7 @@ public:
 
                 ad++;
                 ad %= n;
-                //std::this_thread::sleep_for(std::chrono::seconds(10));
             }
-
-            //last row chunk
             int last_chunk_size_a = m1.rows() % chunk_size_a;
             int row = j * chunk_size_a;
             auto chunk1 = m1.get_rows(row, last_chunk_size_a);
@@ -76,30 +103,9 @@ public:
             chunk_frame dto(row, col, chunk_size_a, chunk_size_b, m1.cols(), chunk1, chunk2);
             sessions_[ad]->send_data(dto.get_data());
         }
-
-        //last column chunk
-        int last_chunk_size_b = m2.cols() % chunk_size_b;
-        int col = i * chunk_size_b; //col + chunk_size_b - ostatnia kolumna chunka
-        auto chunk2 = m2.get_cols(col, last_chunk_size_b);
-
-        int j = 0;
-        for( ; j < m1.rows() / chunk_size_a; j++){
-            int last_chunk_size_a = m1.rows() % chunk_size_a;
-            int row = j * chunk_size_a;
-            auto chunk1 = m1.get_rows(row, chunk_size_a);
-
-            chunk_frame dto(row, col, chunk_size_a, chunk_size_b, m1.cols(), chunk1, chunk2);
-            sessions_[ad]->send_data(dto.get_data());
-
-            ad++;
-            ad %= n;
+        catch(std::exception &e) {
+            std::cout << "Error: " << e.what() << std::endl;
         }
-        int last_chunk_size_a = m1.rows() % chunk_size_a;
-        int row = j * chunk_size_a;
-        auto chunk1 = m1.get_rows(row, last_chunk_size_a);
-
-        chunk_frame dto(row, col, chunk_size_a, chunk_size_b, m1.cols(), chunk1, chunk2);
-        sessions_[ad]->send_data(dto.get_data());
     }
 
 private:
@@ -141,7 +147,7 @@ private:
     asio::io_service& io_service_;
     udp::socket socket_;
 
-    char buffer_[64000];
+    char buffer_[8192];
 };
 
 #endif //PROJECT_SERVER_H
