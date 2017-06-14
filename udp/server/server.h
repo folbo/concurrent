@@ -20,9 +20,10 @@ using namespace asio::ip;
 
 class server {
 public:
-    server(asio::io_service& io_service, short port)
+    server(asio::io_service& io_service, short port, matrix<int>& m)
         : io_service_{io_service},
-          socket_{io_service, udp::endpoint(udp::v4(), port)}
+          socket_{io_service, udp::endpoint(udp::v4(), port)},
+          output_matrix{m}
     {
         listen_hello();
     }
@@ -42,12 +43,12 @@ public:
         // auto
         if(chunk_size_a == -1){
             chunk_size_a = m1.rows() / n;
-            std::cout << "auto-sizing A chunks: sending chunks of" << chunk_size_a << " rows from A." << std::endl;
+            std::cout << "auto-sizing A chunks: sending chunks of " << chunk_size_a << " rows from A." << std::endl;
         }
 
         if(chunk_size_b == -1){
             chunk_size_b = m1.cols() / n;
-            std::cout << "auto-sizing B chunks: sending chunks of" << chunk_size_b << " cols from B." << std::endl;
+            std::cout << "auto-sizing B chunks: sending chunks of " << chunk_size_b << " cols from B." << std::endl;
         }
 
 
@@ -77,6 +78,7 @@ public:
 
                 chunk_frame dto(row, col, chunk_size_a, chunk_size_b, m1.cols(), chunk1, chunk2);
                 sessions_[ad]->send_data(dto.get_data());
+
             }
 
             //last column chunk
@@ -102,6 +104,7 @@ public:
 
             chunk_frame dto(row, col, chunk_size_a, chunk_size_b, m1.cols(), chunk1, chunk2);
             sessions_[ad]->send_data(dto.get_data());
+
         }
         catch(std::exception &e) {
             std::cout << "Error: " << e.what() << std::endl;
@@ -111,14 +114,20 @@ public:
 private:
     void listen_hello()
     {
-        socket_.async_receive_from(asio::buffer(buffer_, 5),
+        socket_.async_receive_from(asio::buffer(buffer_, 50),
                                    last_remote_endpoint_,
                                    [this](std::error_code ec, std::size_t length) {
+
+                                       if(ec) {
+                                           std::cout << "listening for ping end with error: "<<ec.message();
+                                           return;
+                                       }
             if(buffer_[0] == (char)CommandType::Hello)
             {
                auto s = std::make_shared<session>(io_service_,
                                                   socket_,
-                                                  last_remote_endpoint_);
+                                                  last_remote_endpoint_,
+                                                  output_matrix);
                sessions_.emplace_back(s);
 
                std::cout << "accepted connection from "
@@ -127,13 +136,10 @@ private:
                          << last_remote_endpoint_.port()
                          << std::endl;
 
-               socket_.async_send_to(asio::buffer(buffer_, 5),
-                                     last_remote_endpoint_,
-                                     [](std::error_code ec, std::size_t length) {
-                   if (ec) {
-                       std::cout << "Failed reply to Hello. " << ec.message() << std::endl;
-                   }
-               });
+               socket_.send_to(asio::buffer(buffer_, 5),
+                                     last_remote_endpoint_
+
+               );
             }
 
             listen_hello();
@@ -148,6 +154,8 @@ private:
     udp::socket socket_;
 
     char buffer_[8192];
+
+    matrix<int>& output_matrix;
 };
 
 #endif //PROJECT_SERVER_H

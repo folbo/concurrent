@@ -136,9 +136,6 @@
 		<Unit filename="D:/Projekty/concurrent1/udp/client/main.cpp">
 			<Option target="client"/>
 		</Unit>
-		<Unit filename="D:/Projekty/concurrent1/udp/common/protocol/hello_frame.h">
-			<Option target="client"/>
-		</Unit>
 		<Unit filename="D:/Projekty/concurrent1/udp/server/main.cpp">
 			<Option target="server"/>
 		</Unit>

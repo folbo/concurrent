@@ -11,7 +11,7 @@ short port = 1999;
 
 int chunks_size_a = -1;
 int chunks_size_b = -1;
-int m = 1000, n = 100, l = 400;
+int m = 10, n = 10, l = 10;
 
 int main(int argc, char **argv) {
     std::cout << "runnining server" << std::endl;
@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
     try {
         asio::io_service io_service;
 
-        server s(io_service, port);
+        server s(io_service, port, m3);
 
         std::thread t([&io_service]() { io_service.run(); });
 
@@ -88,6 +88,7 @@ int main(int argc, char **argv) {
             else if (input == "i")
                 std::cout << "podpietych wezlow: " << /*s.workers_count() <<*/ std::endl;
             else if (input == "p") {
+                m3.print();
             }
         }
 
