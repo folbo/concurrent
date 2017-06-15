@@ -78,9 +78,8 @@ public:
                 int row = j * chunk_size_a;
                 auto chunk1 = m1.get_rows(row, last_chunk_size_a);
 
-                chunk_frame dto(row, col, chunk_size_a, chunk_size_b, m1.cols(), chunk1, chunk2);
+                chunk_frame dto(row, col, last_chunk_size_a, chunk_size_b, m1.cols(), chunk1, chunk2);
                 sessions_[ad]->send_data(dto);
-
             }
 
             //last column chunk
@@ -94,7 +93,7 @@ public:
                 int row = j * chunk_size_a;
                 auto chunk1 = m1.get_rows(row, chunk_size_a);
 
-                chunk_frame dto(row, col, chunk_size_a, chunk_size_b, m1.cols(), chunk1, chunk2);
+                chunk_frame dto(row, col, chunk_size_a, last_chunk_size_b, m1.cols(), chunk1, chunk2);
                 sessions_[ad]->send_data(dto);
 
                 ad++;
@@ -104,7 +103,7 @@ public:
             int row = j * chunk_size_a;
             auto chunk1 = m1.get_rows(row, last_chunk_size_a);
 
-            chunk_frame dto(row, col, chunk_size_a, chunk_size_b, m1.cols(), chunk1, chunk2);
+            chunk_frame dto(row, col, last_chunk_size_a, last_chunk_size_b, m1.cols(), chunk1, chunk2);
             sessions_[ad]->send_data(dto);
 
         }
@@ -114,8 +113,8 @@ public:
     }
 
     bool check_done(){
-        //if (std::any_of(sessions_.cbegin(), sessions_.cend(),
-                        //[](const std::shared_ptr<session> &worker) { return worker->check_done() == false; }))
+        if (std::any_of(sessions_.cbegin(), sessions_.cend(),
+                        [](const std::shared_ptr<session> &worker) { return worker->check_done() == false; }))
             return false;
         return true;
     }
@@ -147,7 +146,12 @@ private:
             }
             else {
                 char d[length-5];
-                std::memcpy(d, &(buffer_[5]), length);
+
+                int dataLen = bytes_converter::get_int(&(buffer_[1]));
+                if(dataLen != length - 5) {
+                    std::cout << "corrupted datagram income:" << length - 5 << ", should "<< dataLen << std::endl;
+                }
+                std::memcpy(d, &(buffer_[5]), length-5);
 
                 if(buffer_[0] == (char)CommandType::DotProduct)
                     ;//handle_result_dotproduct(d);
@@ -159,16 +163,34 @@ private:
         });
     }
 
-    void handle_result_chunk(char* data, udp::endpoint endpoint){
-        try {
-            chunk_response dto(data);
+    void handle_result_chunk(char* data, udp::endpoint endpoint)
+    {
+        chunk_response dto(data);
+        std::cout << "received response:\n";
+        output_matrix.patch(dto.mat, dto.row, dto.col);
 
-            output_matrix.patch(*dto.mat.get(), dto.row, dto.col);
-            std::cout << "received response.\n";
+        auto s = std::find_if(sessions_.begin(),
+                              sessions_.end(),
+                              [&endpoint](const std::shared_ptr<session> s) {
+                                  return s->Endpoint() == endpoint;
+                              });
+
+        if (s == sessions_.end()) {
+            exit(-4);
         }
-        catch(...){
-            std::cout <<"mam dziada 143" <<std::endl;
+
+        auto res_it = std::find_if((*s)->Results().begin(),
+                                   (*s)->Results().end(),
+                                   [&dto](const result &res) {
+                                       return res.row == dto.row && res.col == dto.col;
+                                   });
+
+        if (res_it == (*s)->Results().end()) {
+            exit(-4);
         }
+
+        res_it->calculated = true;
+
     }
 
 private:

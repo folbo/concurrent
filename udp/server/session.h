@@ -38,29 +38,43 @@ public:
         int row = data.row();
         int col = data.col();
 
-        io_service_.post([this, b, row, col](){
+        std::shared_ptr<session> self = this->shared_from_this();
+        io_service_.post([this, self, b, row, col](){
             std::cout << ". ." << std::endl;
             bool write_in_progress = !output_queue.empty();
             output_queue.push_back(b);
 
-            //results.emplace_back(result(row, col));
+            results.emplace_back(result(row, col));
             if (!write_in_progress) {
                 do_write();
             }
         });
     }
 
-    udp::endpoint Endpoint()
+    udp::endpoint& Endpoint()
     {
         return remote_endpoint_;
     }
 
+    std::list<result>& Results()
+    {
+        return results;
+    }
+
+
     std::atomic<int> received_count;
+
+    bool check_done()
+    {
+        return !std::any_of(results.cbegin(), results.cend(),
+                            [](const result &res) { return !res.calculated; });
+    }
 
 private:
     void do_write()
     {
-        io_service_.post([this]() {
+        std::shared_ptr<session> self = this->shared_from_this();
+        io_service_.post([this, self]() {
             std::shared_ptr<session> self = this->shared_from_this();
             std::vector<char> &top = output_queue.front();
             socket_.async_send_to(asio::buffer(top.data(), top.size()),
@@ -89,8 +103,7 @@ private:
 
     matrix<int>& output_matrix;
 
-    //std::list<result> results;
-
+    std::list<result> results;
 };
 
 #endif //PROJECT_SESSION_H

@@ -10,7 +10,7 @@
 #include "../matrix.h"
 
 struct chunk_response : frame {
-    std::unique_ptr<matrix<int>> mat;
+    matrix<int> mat;
     unsigned int row;
     unsigned int col;
     unsigned int la;
@@ -18,6 +18,7 @@ struct chunk_response : frame {
     unsigned int n;
 
     chunk_response(unsigned int r, unsigned int c, unsigned int a, unsigned int b, unsigned int nn, std::vector<int> m)
+    : mat(1, 1)
     {
         type = (char)CommandType::DotProductChunked;
         data_length = 4 + 4 + 4 + 4 + 4 + (m.size() * 4);
@@ -28,23 +29,22 @@ struct chunk_response : frame {
         lb = b;
         n = nn;
 
-        mat = std::unique_ptr<matrix<int>>(new matrix<int>(la, lb));
-        std::memcpy(mat->get_data().data(), &(m[0]), la * lb * sizeof(int));
+        mat = matrix<int>(la, lb);
+        std::memcpy(mat.get_data().data(), &(m[0]), la * lb * sizeof(int));
     }
 
-    chunk_response(char* data) {
+    chunk_response(char* data) : mat(1, 1) {
         row = bytes_converter::get_uint(&(data[0]));
         col = bytes_converter::get_uint(&(data[4]));
         la = bytes_converter::get_uint(&(data[8]));
         lb = bytes_converter::get_uint(&(data[12]));
         n = bytes_converter::get_uint(&(data[16]));
 
-        mat = std::unique_ptr<matrix<int>>(new matrix<int>(la, lb));
-
-        std::memcpy(mat->get_data().data(), &(data[20]), la * lb * sizeof(int));
+        mat = matrix<int>(la, lb);
+        std::memcpy(mat.get_data().data(), &(data[20]), la * lb * sizeof(int));
     }
 
-    const std::vector<char> get_data() const
+    const std::vector<char> get_data()
     {
         std::vector<char> d(5 + data_length);
 
@@ -70,8 +70,8 @@ struct chunk_response : frame {
         std::memcpy(&(d[21]), n_v.data(), sizeof(unsigned int));
         // append 2 vectors to buffer
 
-        int bytes_of_a = mat->get_data().size()*sizeof(int);
-        std::memcpy(&(d[25]), mat->get_data().data(), bytes_of_a);
+        int bytes_of_a = mat.get_data().size()*sizeof(int);
+        std::memcpy(&(d[25]), mat.get_data().data(), bytes_of_a);
 
         return d;
     }

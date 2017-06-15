@@ -11,14 +11,11 @@ short port = 1999;
 
 int chunks_size_a = -1;
 int chunks_size_b = -1;
-int m = 10, n = 10, l = 10;
+int m = 800, n = 800, l = 800;
 
 int main(int argc, char **argv) {
     std::cout << "runnining server" << std::endl;
     std::cout << "on port: " << port << std::endl;
-
-
-
 
     std::cout << "A chunk size: " << ((chunks_size_a == -1) ? "auto" : std::to_string(chunks_size_a)) << std::endl;
     std::cout << "B chunk size: " << ((chunks_size_b == -1) ? "auto" : std::to_string(chunks_size_b)) << std::endl << std::endl;
@@ -27,17 +24,15 @@ int main(int argc, char **argv) {
     std::cout << "A [ "<< m << " x " << l << " ]" << std::endl;
     matrix<int> m1(m, l);
     for (int i = 0; i < m*l; i++)
-        m1(i / l, i % l) = 1;
+        m1(i / l, i % l) = i;
 
     std::cout << "B [ "<< l << " x " << n << " ]" << std::endl;
     matrix<int> m2(l, n);
     for (int i = 0; i < n*l; i++)
-        m2(i / n, i % n) = 1;
+        m2(i / n, i % n) = i;
 
     matrix<int> m3(m, n);
-
     std::cout << "done." << std::endl << std::endl;
-
     std::cout << "commands:\n"
               << "i - print number of connected nodes\n"
               << "t - start multiplication - one pair of vectors per chunk (unsafe)\n"
@@ -81,9 +76,9 @@ int main(int argc, char **argv) {
 
                 s.begin_mul_chunked(m1, m2, chunks_size_a, chunks_size_b);
 
-                //while(!s.check_done()) {
-                //    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-                //}
+                while(!s.check_done()) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                }
 
                 auto end_time = std::chrono::steady_clock::now();
                 std::cout << "done in "

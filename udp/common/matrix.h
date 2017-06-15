@@ -113,13 +113,11 @@ void matrix<T>::patch(matrix<T> &part, int row, int col) {
     //part.print();
     //std::cout << "into:" << std::endl;
     //print();
-
-    for(int i = 0; i < part.rows(); i++){
-        //std::cout << "row of part: " << i;
-        //std::cout << "row of out:  " << i + row;
-        //std::cout << "col of out" << col;
-        std::memcpy(&(data[(i+row)*cols_ + col]), &(part.get_row(i)[0]), part.cols() * sizeof(T));
-    }
+        for (int i = 0; i < part.rows(); i++) {
+            //std::cout << "row of out:  " << i + row;
+            //std::cout << "col of out" << col;
+            std::memcpy(&(data[(i + row) * cols_ + col]), &(part.get_row(i)[0]), part.cols() * sizeof(T));
+        }
     //std::cout << "result: " << std::endl;
     //print();
 }
