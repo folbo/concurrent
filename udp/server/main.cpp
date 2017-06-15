@@ -53,7 +53,17 @@ int main(int argc, char **argv) {
 
         server s(io_service, port, m3);
 
-        std::thread t([&io_service]() { io_service.run(); });
+        std::thread t([&io_service]() {
+            try {
+                std::error_code ec;
+                io_service.run(ec);
+
+                std::cout << "error: " << ec << std::endl;
+            }
+            catch(std::exception &e){
+                std::cout << "Exception in io_service: " << e.what() << std::endl;
+            }
+        });
 
         char line[2];
         std::cout << "command:: " << std::endl;
@@ -72,7 +82,7 @@ int main(int argc, char **argv) {
                 s.begin_mul_chunked(m1, m2, chunks_size_a, chunks_size_b);
 
                 //while(!s.check_done()) {
-                //    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                //    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
                 //}
 
                 auto end_time = std::chrono::steady_clock::now();

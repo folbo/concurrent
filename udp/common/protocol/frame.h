@@ -21,6 +21,10 @@ struct frame {
 
     char type;
     unsigned int data_length;
+
+    virtual const std::vector<char> get_data() const
+    {
+    }
 };
 
 

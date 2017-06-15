@@ -21,7 +21,7 @@ struct chunk_frame : public frame {
             throw udp_too_big_exception();
     }
 
-    std::vector<char> get_data() {
+    const std::vector<char> get_data() const {
         std::vector<char> d(5 + data_length);
 
         //append header frame info
@@ -58,6 +58,15 @@ struct chunk_frame : public frame {
         return d;
     }
 
+    unsigned int row() const
+    {
+        return row_;
+    }
+
+    unsigned int col() const
+    {
+        return col_;
+    }
 private :
     // result row
     unsigned int row_;

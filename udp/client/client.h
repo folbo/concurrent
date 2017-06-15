@@ -146,24 +146,6 @@ private:
         });
     }
 
-    void do_read_body(std::size_t data_length)
-    {
-        socket_.async_receive_from(asio::buffer(data_ + 5, data_length),
-                                   last_sender_endpoint_,
-                                   [this](std::error_code ec, std::size_t length) {
-            if(last_sender_endpoint_ != server_endpoint_)
-                return;
-
-            if (!ec) {
-
-            }
-            else {
-                std::cout << "socket closed on do_read_result_body" << ec.message();
-                socket_.close();
-            }
-        });
-    }
-
     void do_send_result_chunk(std::vector<int> matrix,
                               unsigned int row,
                               unsigned int col,
@@ -174,7 +156,7 @@ private:
         std::vector<char> result(20 + matrix.size()*sizeof(int));
 
         chunk_response dto(row, col, la, lb, n, matrix);
-        std::vector<char> serialized_frame = dto.serialize();
+        std::vector<char> serialized_frame = dto.get_data();
 
         socket_.async_send_to(asio::buffer(serialized_frame.data(), serialized_frame.size()),
                               server_endpoint_,

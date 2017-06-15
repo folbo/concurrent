@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
 #include <memory>
 #include <deque>
 #include <asio.hpp>
@@ -15,12 +16,13 @@
 #include "../common/matrix.h"
 #include "../common/protocol/chunk_frame.h"
 #include "session.h"
+#include "result.h"
 
 using namespace asio::ip;
 
 class server {
 public:
-    server(asio::io_service& io_service, short port, matrix<int>& m)
+    server(asio::io_service & io_service, short port, matrix<int>& m)
         : io_service_{io_service},
           socket_{io_service, udp::endpoint(udp::v4(), port)},
           output_matrix{m}
@@ -64,7 +66,7 @@ public:
                     auto chunk1 = m1.get_rows(row, chunk_size_a);
 
                     chunk_frame dto(row, col, chunk_size_a, chunk_size_b, m1.cols(), chunk1, chunk2);
-                    sessions_[ad]->send_data(dto.get_data());
+                    sessions_[ad]->send_data(dto);
 
                     ad++;
                     ad %= n;
@@ -77,7 +79,7 @@ public:
                 auto chunk1 = m1.get_rows(row, last_chunk_size_a);
 
                 chunk_frame dto(row, col, chunk_size_a, chunk_size_b, m1.cols(), chunk1, chunk2);
-                sessions_[ad]->send_data(dto.get_data());
+                sessions_[ad]->send_data(dto);
 
             }
 
@@ -93,7 +95,7 @@ public:
                 auto chunk1 = m1.get_rows(row, chunk_size_a);
 
                 chunk_frame dto(row, col, chunk_size_a, chunk_size_b, m1.cols(), chunk1, chunk2);
-                sessions_[ad]->send_data(dto.get_data());
+                sessions_[ad]->send_data(dto);
 
                 ad++;
                 ad %= n;
@@ -103,7 +105,7 @@ public:
             auto chunk1 = m1.get_rows(row, last_chunk_size_a);
 
             chunk_frame dto(row, col, chunk_size_a, chunk_size_b, m1.cols(), chunk1, chunk2);
-            sessions_[ad]->send_data(dto.get_data());
+            sessions_[ad]->send_data(dto);
 
         }
         catch(std::exception &e) {
@@ -111,46 +113,69 @@ public:
         }
     }
 
+    bool check_done(){
+        //if (std::any_of(sessions_.cbegin(), sessions_.cend(),
+                        //[](const std::shared_ptr<session> &worker) { return worker->check_done() == false; }))
+            return false;
+        return true;
+    }
+
 private:
     void listen_hello()
     {
-        socket_.async_receive_from(asio::buffer(buffer_, 50),
+        socket_.async_receive_from(asio::buffer(buffer_, 8192),
                                    last_remote_endpoint_,
                                    [this](std::error_code ec, std::size_t length) {
-
-                                       if(ec) {
-                                           std::cout << "listening for ping end with error: "<<ec.message();
-                                           return;
-                                       }
+            if(ec) {
+                std::cout << "listening for ping end with error: " << ec.message();
+            }
             if(buffer_[0] == (char)CommandType::Hello)
             {
-               auto s = std::make_shared<session>(io_service_,
+                auto s = std::make_shared<session>(io_service_,
                                                   socket_,
                                                   last_remote_endpoint_,
                                                   output_matrix);
-               sessions_.emplace_back(s);
+                sessions_.emplace_back(std::move(s));
 
-               std::cout << "accepted connection from "
-                         << last_remote_endpoint_.address().to_string()
-                         << ":"
-                         << last_remote_endpoint_.port()
-                         << std::endl;
+                std::cout << "accepted connection from "
+                          << last_remote_endpoint_.address().to_string()
+                          << ":"
+                          << last_remote_endpoint_.port()
+                          << std::endl;
 
-               socket_.send_to(asio::buffer(buffer_, 5),
-                                     last_remote_endpoint_
+                socket_.send_to(asio::buffer(buffer_, 5), last_remote_endpoint_);
+            }
+            else {
+                char d[length-5];
+                std::memcpy(d, &(buffer_[5]), length);
 
-               );
+                if(buffer_[0] == (char)CommandType::DotProduct)
+                    ;//handle_result_dotproduct(d);
+                if(buffer_[0] == (char)CommandType::DotProductChunked)
+                    handle_result_chunk(d, last_remote_endpoint_);
             }
 
             listen_hello();
         });
     }
 
+    void handle_result_chunk(char* data, udp::endpoint endpoint){
+        try {
+            chunk_response dto(data);
+
+            output_matrix.patch(*dto.mat.get(), dto.row, dto.col);
+            std::cout << "received response.\n";
+        }
+        catch(...){
+            std::cout <<"mam dziada 143" <<std::endl;
+        }
+    }
+
 private:
     std::vector<std::shared_ptr<session>> sessions_;
 
     udp::endpoint last_remote_endpoint_;
-    asio::io_service& io_service_;
+    asio::io_service & io_service_;
     udp::socket socket_;
 
     char buffer_[8192];

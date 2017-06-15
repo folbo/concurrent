@@ -8,6 +8,6 @@ project(${project_name})
 include_directories(${Boost_INCLUDE_DIR})
 include_directories(${Asio_INCLUDE_DIR})
 
-add_executable (${exe_name} main.cpp server.h session.h)
+add_executable (${exe_name} main.cpp server.h session.h result.h)
 
 target_link_libraries (${exe_name} ws2_32 wsock32)

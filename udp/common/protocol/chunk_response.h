@@ -44,7 +44,8 @@ struct chunk_response : frame {
         std::memcpy(mat->get_data().data(), &(data[20]), la * lb * sizeof(int));
     }
 
-    std::vector<char> serialize() {
+    const std::vector<char> get_data() const
+    {
         std::vector<char> d(5 + data_length);
 
         // append header frame info
