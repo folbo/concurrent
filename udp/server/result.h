@@ -5,14 +5,20 @@
 #ifndef PROJECT_RESULT_H
 #define PROJECT_RESULT_H
 
+#include <functional>
+#include <chrono>
+#include <future>
+#include <cstdio>
+
+
 struct result {
-    result(int r, int c) :
+    result(int r, int c, std::vector<char> v) :
             row{r},
             col{c},
-            calculated{false}
+            frame{v}
     {
     }
-
+    std::vector<char> frame;
     int row;
     int col;
     bool calculated;

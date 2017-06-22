@@ -17,8 +17,12 @@ struct chunk_response : frame {
     unsigned int lb;
     unsigned int n;
 
-    chunk_response(unsigned int r, unsigned int c, unsigned int a, unsigned int b, unsigned int nn, std::vector<int> m)
-    : mat(1, 1)
+    chunk_response(unsigned int r,
+                   unsigned int c,
+                   unsigned int a,
+                   unsigned int b,
+                   unsigned int nn, std::vector<int> m)
+            : mat(1, 1)
     {
         type = (char)CommandType::DotProductChunked;
         data_length = 4 + 4 + 4 + 4 + 4 + (m.size() * 4);

@@ -139,6 +139,9 @@
 		<Unit filename="D:/Projekty/concurrent1/udp/server/main.cpp">
 			<Option target="server"/>
 		</Unit>
+		<Unit filename="D:/Projekty/concurrent1/udp/server/result.h">
+			<Option target="server"/>
+		</Unit>
 		<Unit filename="D:/Projekty/concurrent1/udp/server/server.h">
 			<Option target="server"/>
 		</Unit>

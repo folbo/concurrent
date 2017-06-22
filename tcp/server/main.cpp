@@ -28,6 +28,8 @@ private:
     std::string empty_string;
 };
 
+
+
 /*
  * executable entry
  */
@@ -38,10 +40,11 @@ int chunks_size_a = -1;
 int chunks_size_b = -1;
 int m = 1000, n = 100, l = 400;
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{ 
     InputParser input(argc, argv);
 
-    if(input.cmdOptionExists("-h")) {
+    if(input.cmdOptionExists("-h")){
         std::cout << "-p [port] - set port server will listen on" << std::endl;
         std::cout << "-ar [size] - set number of rows of matrix A" << std::endl;
         std::cout << "-ac [size] - set number of cols of matrix A" << std::endl;
@@ -56,32 +59,32 @@ int main(int argc, char **argv) {
     std::cout << "runnining server" << std::endl;
 
     const std::string &port_s = input.getCmdOption("-p");
-    if (!port_s.empty()){
+    if (!port_s.empty()) {
         port = std::stoi(port_s);
     }
 
     const std::string &chunks_size_a_s = input.getCmdOption("-ca");
-    if (!chunks_size_a_s.empty()){
+    if (!chunks_size_a_s.empty()) {
         chunks_size_a = std::stoi(chunks_size_a_s);
     }
 
     const std::string &chunks_size_b_s = input.getCmdOption("-cb");
-    if (!chunks_size_b_s.empty()){
+    if (!chunks_size_b_s.empty()) {
         chunks_size_b = std::stoi(chunks_size_b_s);
     }
 
     const std::string &a_rows_s = input.getCmdOption("-ar");
-    if (!a_rows_s.empty()){
+    if (!a_rows_s.empty()) {
         m = std::stoi(a_rows_s);
     }
 
     const std::string &a_cols_s = input.getCmdOption("-ac");
-    if (!a_cols_s.empty()){
+    if (!a_cols_s.empty()) {
         l = std::stoi(a_cols_s);
     }
 
     const std::string &b_rows_s = input.getCmdOption("-br");
-    if (!b_rows_s.empty()){
+    if (!b_rows_s.empty()) {
         int rows = std::stoi(b_rows_s);
         if(rows != l) {
             std::cout << "cannot perform multiplication on matrices with given dimensions" << std::endl;
@@ -90,8 +93,8 @@ int main(int argc, char **argv) {
     }
 
     const std::string &b_cols_s = input.getCmdOption("-bc");
-    if (!b_cols_s.empty()){
-        n = std::stoi(b_cols_s);
+    if (!b_cols_s.empty()) {  
+         n = std::stoi(b_cols_s);
     }
 
     std::cout << "on port: " << port << std::endl;
@@ -122,8 +125,8 @@ int main(int argc, char **argv) {
                 << "p - print result matrix" << std::endl
                 << "q - quit" << std::endl << std::endl;
 
-
-    try {
+    try 
+    {
         asio::io_service io_service;
         server s(io_service, port, m3);
 
@@ -132,7 +135,8 @@ int main(int argc, char **argv) {
         char line[2];
         std::cout << "command:: " << std::endl;
 
-        while (std::cin.getline(line, 2)) {
+        while (std::cin.getline(line, 2))
+        {
             std::string input = std::string(line);
 
             if (input == "t") {
@@ -180,6 +184,7 @@ int main(int argc, char **argv) {
 
         s.close();
         t.join();
+
     } catch (std::exception &e) {
         std::cout << "Exception: " << e.what() << "\n";
     }

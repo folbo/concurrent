@@ -16,6 +16,31 @@
 
 using namespace asio::ip;
 
+class later
+{
+public:
+    template <class callable, class... arguments>
+    later(int after, bool async, callable&& f, arguments&&... args)
+    {
+        std::function<typename std::result_of<callable(arguments...)>::type()> task(std::bind(std::forward<callable>(f), std::forward<arguments>(args)...));
+
+        if (async)
+        {
+            std::thread([after, task]() {
+                std::this_thread::sleep_for(std::chrono::milliseconds(after));
+                task();
+            }).detach();
+        }
+        else
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(after));
+            task();
+        }
+    }
+
+};
+
+
 class session : public std::enable_shared_from_this<session> {
 public:
     session(asio::io_service & io_service, udp::socket& socket, udp::endpoint remote_endpoint, matrix<int>& output)
@@ -32,7 +57,7 @@ public:
 
     void send_data(const chunk_frame data)
     {
-        std::cout <<". ";
+        //std::cout <<". ";
 
         auto b = data.get_data();
         int row = data.row();
@@ -40,11 +65,12 @@ public:
 
         std::shared_ptr<session> self = this->shared_from_this();
         io_service_.post([this, self, b, row, col](){
-            std::cout << ". ." << std::endl;
+            //std::cout << ". ." << std::endl;
             bool write_in_progress = !output_queue.empty();
             output_queue.push_back(b);
 
-            results.emplace_back(result(row, col));
+            results.emplace_back(result(row, col, b));
+
             if (!write_in_progress) {
                 do_write();
             }
@@ -81,7 +107,7 @@ private:
                                   remote_endpoint_,
                                   [this, self](std::error_code ec, std::size_t length) {
                 if (!ec) {
-                    std::cout << "sent " << length << " bytes" << std::endl;
+                    //std::cout << "sent " << length << " bytes" << std::endl;
                     output_queue.pop_front();
 
                     if (!output_queue.empty()) {

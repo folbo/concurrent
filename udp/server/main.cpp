@@ -3,6 +3,31 @@
 #include <thread>
 #include "server.h"
 
+class InputParser{
+public:
+    InputParser (int &argc, char **argv){
+        for (int i=1; i < argc; ++i)
+            this->tokens.push_back(std::string(argv[i]));
+    }
+    /// @author iain
+    const std::string& getCmdOption(const std::string &option) const{
+        std::vector<std::string>::const_iterator itr;
+        itr =  std::find(this->tokens.begin(), this->tokens.end(), option);
+        if (itr != this->tokens.end() && ++itr != this->tokens.end()){
+            return *itr;
+        }
+        return empty_string;
+    }
+    /// @author iain
+    bool cmdOptionExists(const std::string &option) const{
+        return std::find(this->tokens.begin(), this->tokens.end(), option)
+               != this->tokens.end();
+    }
+private:
+    std::vector <std::string> tokens;
+    std::string empty_string;
+};
+
 /*
  * executable entry
  */
@@ -11,9 +36,66 @@ short port = 1999;
 
 int chunks_size_a = -1;
 int chunks_size_b = -1;
-int m = 800, n = 800, l = 800;
+int m = 200, n = 200, l = 1000;
 
 int main(int argc, char **argv) {
+
+    InputParser input(argc, argv);
+
+    if(input.cmdOptionExists("-h")) {
+        std::cout << "-p [port] - set port server will listen on" << std::endl;
+        std::cout << "-ar [size] - set number of rows of matrix A" << std::endl;
+        std::cout << "-ac [size] - set number of cols of matrix A" << std::endl;
+        std::cout << "-br [size] - set number of rows of matrix B" << std::endl;
+        std::cout << "-bc [size] - set number of cols of matrix B" << std::endl;
+        std::cout << "-ca [size] - set number of sent rows per chunk from matrix A" << std::endl;
+        std::cout << "-cb [size] - set number of sent cols per chunk from matrix B" << std::endl;
+
+        return 0;
+    }
+
+    std::cout << "\nrunnining server" << std::endl;
+
+    const std::string &port_s = input.getCmdOption("-p");
+    if (!port_s.empty()){
+        port = std::stoi(port_s);
+    }
+
+    const std::string &chunks_size_a_s = input.getCmdOption("-ca");
+    if (!chunks_size_a_s.empty()){
+        chunks_size_a = std::stoi(chunks_size_a_s);
+    }
+
+    const std::string &chunks_size_b_s = input.getCmdOption("-cb");
+    if (!chunks_size_b_s.empty()){
+        chunks_size_b = std::stoi(chunks_size_b_s);
+    }
+
+    const std::string &a_rows_s = input.getCmdOption("-ar");
+    if (!a_rows_s.empty()){
+        m = std::stoi(a_rows_s);
+    }
+
+    const std::string &a_cols_s = input.getCmdOption("-ac");
+    if (!a_cols_s.empty()){
+        l = std::stoi(a_cols_s);
+    }
+
+    const std::string &b_rows_s = input.getCmdOption("-br");
+    if (!b_rows_s.empty()){
+        int rows = std::stoi(b_rows_s);
+        if(rows != l) {
+            std::cout << "cannot perform multiplication on matrices with given dimensions" << std::endl;
+            return 0;
+        }
+    }
+
+    const std::string &b_cols_s = input.getCmdOption("-bc");
+    if (!b_cols_s.empty()){
+        n = std::stoi(b_cols_s);
+    }
+
+
     std::cout << "runnining server" << std::endl;
     std::cout << "on port: " << port << std::endl;
 

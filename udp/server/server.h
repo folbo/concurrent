@@ -166,7 +166,7 @@ private:
     void handle_result_chunk(char* data, udp::endpoint endpoint)
     {
         chunk_response dto(data);
-        std::cout << "received response:\n";
+        //std::cout << "received response:\n";
         output_matrix.patch(dto.mat, dto.row, dto.col);
 
         auto s = std::find_if(sessions_.begin(),
@@ -190,7 +190,6 @@ private:
         }
 
         res_it->calculated = true;
-
     }
 
 private:
